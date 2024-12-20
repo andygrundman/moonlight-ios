@@ -10,6 +10,8 @@
 #import "AppDelegate.h"
 
 @interface SettingsViewController : UIViewController
+@property (strong, nonatomic) IBOutlet UISegmentedControl *audioConfigSelector;
+@property (strong, nonatomic) IBOutlet UISegmentedControl *spatialAudioSelector;
 @property (strong, nonatomic) IBOutlet UILabel *bitrateLabel;
 @property (strong, nonatomic) IBOutlet UISlider *bitrateSlider;
 @property (strong, nonatomic) IBOutlet UISegmentedControl *framerateSelector;

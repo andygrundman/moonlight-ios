@@ -9,6 +9,7 @@
 #import "Connection.h"
 #import "Plot.h"
 #import "Utils.h"
+#import "CoreAudioHelpers.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 
@@ -38,13 +39,11 @@ static int activeVideoFormat;
 static video_stats_t currentVideoStats;
 static video_stats_t lastVideoStats;
 static NSLock* videoStatsLock;
-
-static SDL_AudioDeviceID audioDevice;
-static OPUS_MULTISTREAM_CONFIGURATION audioConfig;
-static void* audioBuffer;
-static int audioFrameSize;
-
 static VideoDecoderRenderer* renderer;
+
+static OPUS_MULTISTREAM_CONFIGURATION opusConfig;
+static bool audioIsStopping = false;
+static CoreAudioRenderer* audioRenderer;
 
 static BandwidthTracker *bwTracker;
 
@@ -85,6 +84,11 @@ void DrCleanup(void)
     }
     [videoStatsLock unlock];
     return NO;
+}
+
+-(NSString *)getAudioStatsString
+{
+    return [audioRenderer getAudioStatsString];
 }
 
 -(NSString*) getActiveCodecName
@@ -147,7 +151,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit)
         // A frame was lost due to OOM condition
         return DR_NEED_IDR;
     }
-    
+
     CFTimeInterval now = CACurrentMediaTime();
     if (!lastFrameNumber) {
         currentVideoStats.startTime = now;
@@ -157,15 +161,15 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit)
         // Flip stats roughly every second
         if (now - currentVideoStats.startTime >= 1.0f) {
             currentVideoStats.endTime = now;
-            
+
             [videoStatsLock lock];
             lastVideoStats = currentVideoStats;
             [videoStatsLock unlock];
-            
+
             memset(&currentVideoStats, 0, sizeof(currentVideoStats));
             currentVideoStats.startTime = now;
         }
-        
+
         // Any frame number greater than m_LastFrameNumber + 1 represents a dropped frame
         int droppedFrames = decodeUnit->frameNumber - (lastFrameNumber + 1);
         if (droppedFrames > 0) {
@@ -176,20 +180,20 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit)
         }
         lastFrameNumber = decodeUnit->frameNumber;
     }
-    
+
     if (decodeUnit->frameHostProcessingLatency != 0) {
         if (currentVideoStats.minHostProcessingLatency == 0 || decodeUnit->frameHostProcessingLatency < currentVideoStats.minHostProcessingLatency) {
             currentVideoStats.minHostProcessingLatency = decodeUnit->frameHostProcessingLatency;
         }
-        
+
         if (decodeUnit->frameHostProcessingLatency > currentVideoStats.maxHostProcessingLatency) {
             currentVideoStats.maxHostProcessingLatency = decodeUnit->frameHostProcessingLatency;
         }
-        
+
         currentVideoStats.framesWithHostProcessingLatency++;
         currentVideoStats.totalHostProcessingLatency += decodeUnit->frameHostProcessingLatency;
     }
-    
+
     currentVideoStats.receivedFrames++;
     currentVideoStats.totalFrames++;
 
@@ -225,107 +229,91 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit)
                         decodeStartTime:decodeStartTime];
 }
 
-int ArInit(int audioConfiguration, POPUS_MULTISTREAM_CONFIGURATION opusConfig, void* context, int flags)
-{
+int ArInit(int audioConfiguration, POPUS_MULTISTREAM_CONFIGURATION inOpusConfig, void* context, int flags) {
     int err;
-    SDL_AudioSpec want, have;
-    
-    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
-        Log(LOG_E, @"Failed to initialize audio subsystem: %s\n", SDL_GetError());
+    audioRenderer = [[CoreAudioRenderer alloc] initWithConfig:inOpusConfig];
+    if (!audioRenderer) {
+        Log(LOG_E, @"Failed to initialize audio subsystem\n");
         return -1;
     }
-        
-    SDL_zero(want);
-    want.freq = opusConfig->sampleRate;
-    want.format = AUDIO_F32;
-    want.channels = opusConfig->channelCount;
-    want.samples = opusConfig->samplesPerFrame;
 
-    audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-    if (audioDevice == 0) {
-        Log(LOG_E, @"Failed to open audio device: %s\n", SDL_GetError());
-        ArCleanup();
-        return -1;
-    }
-    
-    audioConfig = *opusConfig;
-    audioFrameSize = opusConfig->samplesPerFrame * sizeof(float) * opusConfig->channelCount;
-    audioBuffer = SDL_malloc(audioFrameSize);
-    if (audioBuffer == NULL) {
-        Log(LOG_E, @"Failed to allocate audio frame buffer");
-        ArCleanup();
-        return -1;
-    }
-    
-    opusDecoder = opus_multistream_decoder_create(opusConfig->sampleRate,
-                                                  opusConfig->channelCount,
-                                                  opusConfig->streams,
-                                                  opusConfig->coupledStreams,
-                                                  opusConfig->mapping,
+    opusConfig = *inOpusConfig;
+    opusDecoder = opus_multistream_decoder_create(opusConfig.sampleRate,
+                                                  opusConfig.channelCount,
+                                                  opusConfig.streams,
+                                                  opusConfig.coupledStreams,
+                                                  opusConfig.mapping,
                                                   &err);
+
     if (opusDecoder == NULL) {
         Log(LOG_E, @"Failed to create Opus decoder");
         ArCleanup();
         return -1;
     }
-    
-    // Start playback
-    SDL_PauseAudioDevice(audioDevice, 0);
-    
-    // Disable lowering volume of other audio streams (SDL sets AVAudioSessionCategoryOptionDuckOthers by default)
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
-    
+
     return 0;
 }
 
-void ArCleanup(void)
-{
+void ArStart(void) {
+    audioIsStopping = false;
+    [audioRenderer start];
+}
+
+void ArStop(void) {
+    [audioRenderer stop];
+    audioIsStopping = true;
+}
+
+void ArCleanup(void) {
     if (opusDecoder != NULL) {
         opus_multistream_decoder_destroy(opusDecoder);
         opusDecoder = NULL;
     }
-    
-    if (audioDevice != 0) {
-        SDL_CloseAudioDevice(audioDevice);
-        audioDevice = 0;
-    }
-    
-    if (audioBuffer != NULL) {
-        SDL_free(audioBuffer);
-        audioBuffer = NULL;
-    }
-    
-    SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-void ArDecodeAndPlaySample(char* sampleData, int sampleLength)
-{
-    int decodeLen;
-    
-    // Don't queue if there's already more than 30 ms of audio data waiting
-    // in Moonlight's audio queue.
-    if (LiGetPendingAudioDuration() > 30) {
+void ArDecodeAndPlaySample(char* sampleData, int sampleLength) {
+    if (audioIsStopping)
+        return;
+
+    CFTimeInterval decodeStartTime = CACurrentMediaTime();
+
+    int sampleSize = sizeof(float);
+    int frameSize = sampleSize * opusConfig.channelCount;
+    int desiredBufferSize = frameSize * opusConfig.samplesPerFrame;
+    void* buffer = [audioRenderer getAudioBuffer:&desiredBufferSize];
+
+    int samplesDecoded = opus_multistream_decode_float(opusDecoder, (unsigned char*)sampleData, sampleLength,
+                                                   (float*)buffer, desiredBufferSize / frameSize, 0);
+
+    if (samplesDecoded < 0) {
+        if (samplesDecoded != OPUS_BUFFER_TOO_SMALL) {
+            // OPUS_BUFFER_TOO_SMALL (-2) is a normal situation when sometimes we get Opus packets that are all 0's
+            Log(LOG_E, @"opus decode error: %d", samplesDecoded);
+        }
         return;
     }
 
-    decodeLen = opus_multistream_decode_float(opusDecoder,
-                                              (unsigned char*)sampleData,
-                                              sampleLength,
-                                              (float*)audioBuffer,
-                                              audioConfig.samplesPerFrame,
-                                              0);
-    if (decodeLen > 0) {
-        // Provide backpressure on the queue to ensure too many frames don't build up
-        // in SDL's audio queue.
-        while (SDL_GetQueuedAudioSize(audioDevice) / audioFrameSize > 10) {
-            [NSThread sleepForTimeInterval:0.001f];
-        }
-        
-        if (SDL_QueueAudio(audioDevice,
-                           audioBuffer,
-                           sizeof(float) * decodeLen * audioConfig.channelCount) < 0) {
-            Log(LOG_E, @"Failed to queue audio sample: %s\n", SDL_GetError());
-        }
+    static int lastBufferSize = 0;
+    if (desiredBufferSize != lastBufferSize) {
+        // light logging only if changed
+        Log(LOG_I, @"opus decoder: %d samples, %d opus bytes, %d PCM bytes",
+            samplesDecoded, sampleLength, desiredBufferSize);
+        lastBufferSize = desiredBufferSize;
+    }
+
+    // Update desiredSize with the number of bytes actually populated by the decoding operation
+    if (samplesDecoded > 0) {
+        desiredBufferSize = frameSize * samplesDecoded;
+    }
+    else {
+        desiredBufferSize = 0;
+    }
+
+    if (![audioRenderer submitAudio:desiredBufferSize opusBytes:sampleLength decodeStartTime:decodeStartTime]) {
+        // something changed or broke, reinit the audio
+        Log(LOG_I, @"CoreAudioRenderer needs to reinitialize...");
+        ArCleanup();
+        ArInit(-1, &opusConfig, NULL, -1); // XXX we don't use the other params but this is still gross
     }
 }
 
@@ -400,7 +388,7 @@ void ClSetControllerLED(uint16_t controllerNumber, uint8_t r, uint8_t g, uint8_t
     // won't be able to acquire it if LiStartConnection is in
     // progress.
     LiInterruptConnection();
-    
+
     // We dispatch this async to get out because this can be invoked
     // on a thread inside common and we don't want to deadlock. It also avoids
     // blocking on the caller's thread waiting to acquire initLock.
@@ -420,11 +408,11 @@ void ClSetControllerLED(uint16_t controllerNumber, uint8_t r, uint8_t g, uint8_t
     if (initLock == nil) {
         initLock = [[NSLock alloc] init];
     }
-    
+
     if (videoStatsLock == nil) {
         videoStatsLock = [[NSLock alloc] init];
     }
-    
+
     NSString *rawAddress = [Utils addressPortStringToAddress:config.host];
     strncpy(_hostString,
             [rawAddress cStringUsingEncoding:NSUTF8StringEncoding],
@@ -482,7 +470,7 @@ void ClSetControllerLED(uint16_t controllerNumber, uint8_t r, uint8_t g, uint8_t
     // on a 64-bit device with ARMv8 crypto instructions, so we don't
     // need to check for that here.
     _streamConfig.encryptionFlags = ENCFLG_ALL;
-    
+
     if ([Utils isActiveNetworkVPN]) {
         // Force remote streaming mode when a VPN is connected
         _streamConfig.streamingRemotely = STREAM_CFG_REMOTE;
@@ -508,7 +496,10 @@ void ClSetControllerLED(uint16_t controllerNumber, uint8_t r, uint8_t g, uint8_t
                                 CAPABILITY_REFERENCE_FRAME_INVALIDATION_AV1;
 
     LiInitializeAudioCallbacks(&_arCallbacks);
+
     _arCallbacks.init = ArInit;
+    _arCallbacks.start = ArStart;
+    _arCallbacks.stop = ArStop;
     _arCallbacks.cleanup = ArCleanup;
     _arCallbacks.decodeAndPlaySample = ArDecodeAndPlaySample;
     _arCallbacks.capabilities = CAPABILITY_SUPPORTS_ARBITRARY_AUDIO_DURATION;

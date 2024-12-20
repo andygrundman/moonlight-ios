@@ -715,7 +715,7 @@
 				FB1A67F621324EE300507771 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		FB290E2919B37A4E004C83CF /* Build configuration list for PBXProject "moonlight-common" */ = {
 			isa = XCConfigurationList;
@@ -724,7 +724,7 @@
 				FB290E3119B37A4E004C83CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		FB290E3219B37A4E004C83CF /* Build configuration list for PBXNativeTarget "moonlight-common" */ = {
 			isa = XCConfigurationList;
@@ -733,7 +733,7 @@
 				FB290E3419B37A4E004C83CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 

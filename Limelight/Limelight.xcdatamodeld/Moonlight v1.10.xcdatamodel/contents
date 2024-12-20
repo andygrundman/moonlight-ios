@@ -38,6 +38,7 @@
         <attribute name="optimizeGames" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="playAudioOnPC" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="preferredCodec" attributeType="Integer 32" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="spatialAudio" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="statsOverlay" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="swapABXYButtons" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="uniqueId" attributeType="String" syncable="YES"/>

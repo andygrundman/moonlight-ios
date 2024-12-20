@@ -13,9 +13,9 @@
 
 - (id) initFromSettings:(Settings*)settings {
     self = [self init];
-    
+
     self.parent = settings;
-    
+
 #if TARGET_OS_TV
     // Apply default values from our Root.plist
     NSString* settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -29,7 +29,7 @@
         }
     }
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
-    
+
     self.bitrate = [NSNumber numberWithInteger:[[NSUserDefaults standardUserDefaults] integerForKey:@"bitrate"]];
     assert([self.bitrate intValue] != 0);
     self.framerate = [NSNumber numberWithDouble:[[NSUserDefaults standardUserDefaults] doubleForKey:@"framerate"]];
@@ -77,6 +77,7 @@
     self.height = settings.height;
     self.width = settings.width;
     self.audioConfig = settings.audioConfig;
+    self.spatialAudio = settings.spatialAudio;
     self.preferredCodec = settings.preferredCodec;
     self.frameQueueSize = settings.frameQueueSize;
     self.playAudioOnPC = settings.playAudioOnPC;
@@ -93,7 +94,7 @@
     self.graphOpacity = settings.graphOpacity;
 #endif
     self.uniqueId = settings.uniqueId;
-    
+
     return self;
 }
 

@@ -57,6 +57,22 @@
 		A12476E42E161986008D54F5 /* ImGuiPlots.mm in Sources */ = {isa = PBXBuildFile; fileRef = A12476E22E161982008D54F5 /* ImGuiPlots.mm */; };
 		A156D0492E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */ = {isa = PBXBuildFile; fileRef = A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */; };
 		A156D04A2E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */ = {isa = PBXBuildFile; fileRef = A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */; };
+		A15AFBDA2D1615B200848F45 /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */; };
+		A15AFBDB2D1615B200848F45 /* OutputAU.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD62D1615B200848F45 /* OutputAU.mm */; };
+		A15AFBDC2D1615B200848F45 /* AUSpatialMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */; };
+		A15AFBDD2D1615B200848F45 /* CoreAudioRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */; };
+		A15AFBDE2D1615B200848F45 /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */; };
+		A15AFBDF2D1615B200848F45 /* OutputAU.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD62D1615B200848F45 /* OutputAU.mm */; };
+		A15AFBE02D1615B200848F45 /* AUSpatialMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */; };
+		A15AFBE12D1615B200848F45 /* CoreAudioRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */; };
+		A15AFBE42D16161100848F45 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE32D16161000848F45 /* Accelerate.framework */; };
+		A15AFBE62D16161600848F45 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE52D16161600848F45 /* AudioToolbox.framework */; };
+		A15AFBE82D16161A00848F45 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE72D16161A00848F45 /* AVFAudio.framework */; };
+		A15AFBEA2D16163A00848F45 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE92D16163A00848F45 /* CoreAudio.framework */; };
+		A15AFBED2D1616A600848F45 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBEC2D1616A600848F45 /* Accelerate.framework */; };
+		A15AFBEF2D1616AD00848F45 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */; };
+		A15AFBF12D1616B000848F45 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBF02D1616B000848F45 /* AVFAudio.framework */; };
+		A15AFBF32D1616B400848F45 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBF22D1616B400848F45 /* CoreAudio.framework */; };
 		A19562AC2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */; };
 		A19562AD2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */; };
 		A1967D9A2DEE419F00EFC5CF /* FloatBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1967D992DEE419B00EFC5CF /* FloatBuffer.m */; };
@@ -75,6 +91,8 @@
 		A1C760BF2E10FAB600110E0E /* MetalVideoRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1C760BD2E10FAB300110E0E /* MetalVideoRenderer.m */; };
 		A1D0DEAD2E06018400086726 /* Frame.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D0DEAC2E06018200086726 /* Frame.m */; };
 		A1D0DEAE2E06018400086726 /* Frame.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D0DEAC2E06018200086726 /* Frame.m */; };
+		A1D2C4222D1E8F820093BA7D /* AudioStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */; };
+		A1D2C4232D1E8F820093BA7D /* AudioStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */; };
 		A1D406AE2E0A77AC00DC0A77 /* FrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */; };
 		A1D406AF2E0A77AC00DC0A77 /* FrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */; };
 		A1D406B02E0A77AC00DC0A77 /* FrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */; };
@@ -275,6 +293,26 @@
 		A13F905C2DFC3C710010BB0F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/AppleTVOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		A13F90E22DFD2DE10010BB0F /* MoonlightTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoonlightTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = "Shaders-Linear.metal"; sourceTree = "<group>"; };
+		A15AFBCF2D1615B200848F45 /* AllocatedAudioBufferList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AllocatedAudioBufferList.h; sourceTree = "<group>"; };
+		A15AFBD02D1615B200848F45 /* AUSpatialMixer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AUSpatialMixer.h; sourceTree = "<group>"; };
+		A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AUSpatialMixer.mm; sourceTree = "<group>"; };
+		A15AFBD22D1615B200848F45 /* CoreAudioHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreAudioHelpers.h; sourceTree = "<group>"; };
+		A15AFBD32D1615B200848F45 /* CoreAudioRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreAudioRenderer.h; sourceTree = "<group>"; };
+		A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreAudioRenderer.mm; sourceTree = "<group>"; };
+		A15AFBD52D1615B200848F45 /* OutputAU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OutputAU.h; sourceTree = "<group>"; };
+		A15AFBD62D1615B200848F45 /* OutputAU.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OutputAU.mm; sourceTree = "<group>"; };
+		A15AFBD72D1615B200848F45 /* TPCircularBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TPCircularBuffer.h; sourceTree = "<group>"; };
+		A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = TPCircularBuffer.c; sourceTree = "<group>"; };
+		A15AFBE22D1615E200848F45 /* Moonlight.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Moonlight.entitlements; sourceTree = "<group>"; };
+		A15AFBE32D16161000848F45 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		A15AFBE52D16161600848F45 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		A15AFBE72D16161A00848F45 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
+		A15AFBE92D16163A00848F45 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A15AFBEB2D16168900848F45 /* Moonlight TV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Moonlight TV.entitlements"; sourceTree = "<group>"; };
+		A15AFBEC2D1616A600848F45 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		A15AFBF02D1616B000848F45 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/AVFAudio.framework; sourceTree = DEVELOPER_DIR; };
+		A15AFBF22D1616B400848F45 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
 		A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = imgui_impl_metal.mm; sourceTree = "<group>"; };
 		A1967D992DEE419B00EFC5CF /* FloatBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FloatBuffer.m; sourceTree = "<group>"; };
 		A1967DB32DF036B800EFC5CF /* Plot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plot.h; sourceTree = "<group>"; };
@@ -291,6 +329,8 @@
 		A1C760BD2E10FAB300110E0E /* MetalVideoRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalVideoRenderer.m; sourceTree = "<group>"; };
 		A1D0DEAB2E06013600086726 /* Frame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Frame.h; sourceTree = "<group>"; };
 		A1D0DEAC2E06018200086726 /* Frame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Frame.m; sourceTree = "<group>"; };
+		A1D2C4202D1E8F750093BA7D /* AudioStats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioStats.h; sourceTree = "<group>"; };
+		A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AudioStats.cpp; sourceTree = "<group>"; };
 		A1D406AC2E0A77AC00DC0A77 /* FrameQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrameQueue.h; sourceTree = "<group>"; };
 		A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FrameQueue.m; sourceTree = "<group>"; };
 		A1EBD2F52DD94CE800F3BF4B /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -426,12 +466,16 @@
 				9865DC30213260B40005B9B9 /* libmoonlight-common-tv.a in Frameworks */,
 				9865DC3C2132922E0005B9B9 /* GameController.framework in Frameworks */,
 				98882A0D2AF60FA000C5A11C /* libavformat.a in Frameworks */,
+				A15AFBF32D1616B400848F45 /* CoreAudio.framework in Frameworks */,
 				98882A0E2AF60FA300C5A11C /* libavutil.a in Frameworks */,
 				F74BEFA42C1A80E400224667 /* OpenSSL in Frameworks */,
+				A15AFBEF2D1616AD00848F45 /* AudioToolbox.framework in Frameworks */,
 				FB1A67EA21324DF300507771 /* libxml2.tbd in Frameworks */,
+				A15AFBF12D1616B000848F45 /* AVFAudio.framework in Frameworks */,
 				FB1A67E821324DE300507771 /* libopus.a in Frameworks */,
 				98181BEB2791278F00E43572 /* libSDL2.a in Frameworks */,
 				FB1A67E521324A1F00507771 /* CoreData.framework in Frameworks */,
+				A15AFBED2D1616A600848F45 /* Accelerate.framework in Frameworks */,
 				98B9CE6D27B2144B00B473C4 /* AVKit.framework in Frameworks */,
 				98882A0C2AF60F9E00C5A11C /* libavcodec.a in Frameworks */,
 			);
@@ -441,8 +485,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A15AFBEA2D16163A00848F45 /* CoreAudio.framework in Frameworks */,
 				9890CF6B203B7EE1006C4B06 /* libxml2.tbd in Frameworks */,
 				98CFB82F1CAD481B0048EF74 /* libmoonlight-common.a in Frameworks */,
+				A15AFBE82D16161A00848F45 /* AVFAudio.framework in Frameworks */,
 				FB8946ED19F6AFE800339C8A /* libopus.a in Frameworks */,
 				98882A082AF60F7400C5A11C /* libavutil.a in Frameworks */,
 				FB290CF419B2C406004C83CF /* CoreGraphics.framework in Frameworks */,
@@ -452,7 +498,9 @@
 				98882A072AF60F7200C5A11C /* libavformat.a in Frameworks */,
 				FB290CF619B2C406004C83CF /* UIKit.framework in Frameworks */,
 				FB290CF219B2C406004C83CF /* Foundation.framework in Frameworks */,
+				A15AFBE62D16161600848F45 /* AudioToolbox.framework in Frameworks */,
 				FB4679011A57048000377732 /* CoreFoundation.framework in Frameworks */,
+				A15AFBE42D16161100848F45 /* Accelerate.framework in Frameworks */,
 				98181BE92791277400E43572 /* libSDL2.a in Frameworks */,
 				98882A062AF60F7000C5A11C /* libavcodec.a in Frameworks */,
 			);
@@ -503,6 +551,25 @@
 			path = Stats;
 			sourceTree = "<group>";
 		};
+		A15AFBD92D1615B200848F45 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */,
+				A1D2C4202D1E8F750093BA7D /* AudioStats.h */,
+				A15AFBCF2D1615B200848F45 /* AllocatedAudioBufferList.h */,
+				A15AFBD02D1615B200848F45 /* AUSpatialMixer.h */,
+				A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */,
+				A15AFBD22D1615B200848F45 /* CoreAudioHelpers.h */,
+				A15AFBD32D1615B200848F45 /* CoreAudioRenderer.h */,
+				A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */,
+				A15AFBD52D1615B200848F45 /* OutputAU.h */,
+				A15AFBD62D1615B200848F45 /* OutputAU.mm */,
+				A15AFBD72D1615B200848F45 /* TPCircularBuffer.h */,
+				A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
 		A1A777E82DDBECE600E071D8 /* ImGui */ = {
 			isa = PBXGroup;
 			children = (
@@ -523,6 +590,7 @@
 		FB1A67542132419700507771 /* Moonlight TV */ = {
 			isa = PBXGroup;
 			children = (
+				A15AFBEB2D16168900848F45 /* Moonlight TV.entitlements */,
 				FB1A675E2132419700507771 /* Main.storyboard */,
 				FB1A67612132419A00507771 /* Assets.xcassets */,
 				FB1A67632132419A00507771 /* Info.plist */,
@@ -543,6 +611,7 @@
 				A13F90E32DFD2DE10010BB0F /* MoonlightTests */,
 				FB290CF019B2C406004C83CF /* Frameworks */,
 				FB290CEF19B2C406004C83CF /* Products */,
+				A15AFBE22D1615E200848F45 /* Moonlight.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -565,6 +634,14 @@
 				A1EBD2FA2DD94CFC00F3BF4B /* Metal.framework */,
 				A1EBD2F62DD94CE900F3BF4B /* MetalKit.framework */,
 				A1EBD2F92DD94CFC00F3BF4B /* MetalKit.framework */,
+				A15AFBF22D1616B400848F45 /* CoreAudio.framework */,
+				A15AFBF02D1616B000848F45 /* AVFAudio.framework */,
+				A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */,
+				A15AFBEC2D1616A600848F45 /* Accelerate.framework */,
+				A15AFBE92D16163A00848F45 /* CoreAudio.framework */,
+				A15AFBE72D16161A00848F45 /* AVFAudio.framework */,
+				A15AFBE52D16161600848F45 /* AudioToolbox.framework */,
+				A15AFBE32D16161000848F45 /* Accelerate.framework */,
 				98882A032AF60F5300C5A11C /* libavcodec.a */,
 				98882A052AF60F5300C5A11C /* libavformat.a */,
 				98882A0A2AF60F9000C5A11C /* libavcodec.a */,
@@ -596,6 +673,7 @@
 				A12025BE2DD7E36B005015C8 /* ImGuiRenderer.mm */,
 				A12025BD2DD7E352005015C8 /* ImGuiRenderer.h */,
 				D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */,
+				A15AFBD92D1615B200848F45 /* Audio */,
 				FB89460419F646E200339C8A /* Crypto */,
 				FB89460919F646E200339C8A /* Input */,
 				A12476CF2E149562008D54F5 /* Metal */,
@@ -1092,11 +1170,16 @@
 				FB1A67B5213245D500507771 /* HttpResponse.m in Sources */,
 				FB1A67B7213245D500507771 /* ServerInfoResponse.m in Sources */,
 				FB1A67B9213245D500507771 /* AppAssetResponse.m in Sources */,
+				A1D2C4222D1E8F820093BA7D /* AudioStats.cpp in Sources */,
 				FB1A67BB213245D500507771 /* AppListResponse.m in Sources */,
 				9819CC1D254F1730008A7C8E /* RelativeTouchHandler.m in Sources */,
 				FB1A67AB213245C500507771 /* CryptoManager.m in Sources */,
 				FB1A67AF213245C500507771 /* IdManager.m in Sources */,
 				988FCD42293B091B003050E2 /* KeyboardInputField.m in Sources */,
+				A15AFBDA2D1615B200848F45 /* TPCircularBuffer.c in Sources */,
+				A15AFBDB2D1615B200848F45 /* OutputAU.mm in Sources */,
+				A15AFBDC2D1615B200848F45 /* AUSpatialMixer.mm in Sources */,
+				A15AFBDD2D1615B200848F45 /* CoreAudioRenderer.mm in Sources */,
 				FB1A67A3213245BD00507771 /* Connection.m in Sources */,
 				A10BC62C2DE8E65800905783 /* BandwidthTracker.m in Sources */,
 				FB1A67A5213245BD00507771 /* StreamConfiguration.m in Sources */,
@@ -1117,6 +1200,7 @@
 				FB1A674D2131E65900507771 /* KeyboardSupport.m in Sources */,
 				FB89463219F646E200339C8A /* VideoDecoderRenderer.m in Sources */,
 				A12476D32E14959E008D54F5 /* MetalViewController.m in Sources */,
+				A1D2C4232D1E8F820093BA7D /* AudioStats.cpp in Sources */,
 				FB290D0419B2C406004C83CF /* AppDelegate.m in Sources */,
 				A156D04A2E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */,
 				FB9AFD401A7E127D00872C98 /* AppListResponse.m in Sources */,
@@ -1124,6 +1208,10 @@
 				FBDE86E619F82297001C18A8 /* UIAppView.m in Sources */,
 				FB89462F19F646E200339C8A /* Connection.m in Sources */,
 				A19562AD2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */,
+				A15AFBDE2D1615B200848F45 /* TPCircularBuffer.c in Sources */,
+				A15AFBDF2D1615B200848F45 /* OutputAU.mm in Sources */,
+				A15AFBE02D1615B200848F45 /* AUSpatialMixer.mm in Sources */,
+				A15AFBE12D1615B200848F45 /* CoreAudioRenderer.mm in Sources */,
 				FB9AFD321A7D867C00872C98 /* AppAssetRetriever.m in Sources */,
 				FB4678FF1A565DAC00377732 /* WakeOnLanManager.m in Sources */,
 				FB53E1431BE5DC4400CD6ECE /* IdManager.m in Sources */,
@@ -1244,7 +1332,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.hybridized.MoonlightTests";
+				PRODUCT_BUNDLE_IDENTIFIER = org.hybridized.MoonlightTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1277,7 +1365,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.hybridized.MoonlightTests";
+				PRODUCT_BUNDLE_IDENTIFIER = org.hybridized.MoonlightTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1295,6 +1383,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Moonlight TV/Moonlight TV.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -1350,6 +1439,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Moonlight TV/Moonlight TV.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1524,6 +1614,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Moonlight.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -1582,6 +1673,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Moonlight.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -1650,7 +1742,7 @@
 				FB1A67672132419A00507771 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		FB290CE919B2C406004C83CF /* Build configuration list for PBXProject "Moonlight" */ = {
 			isa = XCConfigurationList;
@@ -1659,7 +1751,7 @@
 				FB290D1F19B2C406004C83CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		FB290D2019B2C406004C83CF /* Build configuration list for PBXNativeTarget "Moonlight" */ = {
 			isa = XCConfigurationList;
@@ -1668,7 +1760,7 @@
 				FB290D2219B2C406004C83CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 
