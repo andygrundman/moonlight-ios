@@ -648,7 +648,9 @@ static NSMutableSet* hostList;
     int physicalOutputChannels = (int)[AVAudioSession sharedInstance].maximumOutputNumberOfChannels;
     Log(LOG_I, @"Audio device supports %d channels", physicalOutputChannels);
     
-    int numberOfChannels = MIN([streamSettings.audioConfig intValue], physicalOutputChannels);
+    // XXX UI
+    // int numberOfChannels = MIN([streamSettings.audioConfig intValue], physicalOutputChannels);
+    int numberOfChannels = [streamSettings.audioConfig intValue];
     Log(LOG_I, @"Selected number of audio channels %d", numberOfChannels);
     if (numberOfChannels >= 8) {
         _streamConfig.audioConfiguration = AUDIO_CONFIGURATION_71_SURROUND;

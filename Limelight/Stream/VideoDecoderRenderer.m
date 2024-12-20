@@ -35,6 +35,8 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     
     CADisplayLink* _displayLink;
     BOOL framePacing;
+
+    CFTimeInterval decodeStart;
 }
 
 - (void)reinitializeDisplayLayer
@@ -595,6 +597,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
     }
 
     // Enqueue the next frame
+    self->decodeStart = CACurrentMediaTime();
     [self->displayLayer enqueueSampleBuffer:sampleBuffer];
     
     if (du->frameType == FRAME_TYPE_IDR) {

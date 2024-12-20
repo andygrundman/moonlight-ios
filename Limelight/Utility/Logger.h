@@ -23,7 +23,15 @@ typedef enum {
 #define PRFX_WARN @"<WARN>"
 #define PRFX_ERROR @"<ERROR>"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void Log(LogLevel level, NSString* fmt, ...);
 void LogTag(LogLevel level, NSString* tag, NSString* fmt, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

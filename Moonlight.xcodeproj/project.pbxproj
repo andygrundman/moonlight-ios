@@ -41,6 +41,22 @@
 		98CFB82F1CAD481B0048EF74 /* libmoonlight-common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98AB2E841CAD46840089BB98 /* libmoonlight-common.a */; };
 		98D5856D1C0EA79600F6CC00 /* TemporaryHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */; };
 		98D585701C0ED0E800F6CC00 /* TemporarySettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */; };
+		A15AFBDA2D1615B200848F45 /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */; };
+		A15AFBDB2D1615B200848F45 /* OutputAU.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD62D1615B200848F45 /* OutputAU.mm */; };
+		A15AFBDC2D1615B200848F45 /* AUSpatialMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */; };
+		A15AFBDD2D1615B200848F45 /* CoreAudioRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */; };
+		A15AFBDE2D1615B200848F45 /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */; };
+		A15AFBDF2D1615B200848F45 /* OutputAU.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD62D1615B200848F45 /* OutputAU.mm */; };
+		A15AFBE02D1615B200848F45 /* AUSpatialMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */; };
+		A15AFBE12D1615B200848F45 /* CoreAudioRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */; };
+		A15AFBE42D16161100848F45 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE32D16161000848F45 /* Accelerate.framework */; };
+		A15AFBE62D16161600848F45 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE52D16161600848F45 /* AudioToolbox.framework */; };
+		A15AFBE82D16161A00848F45 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE72D16161A00848F45 /* AVFAudio.framework */; };
+		A15AFBEA2D16163A00848F45 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBE92D16163A00848F45 /* CoreAudio.framework */; };
+		A15AFBED2D1616A600848F45 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBEC2D1616A600848F45 /* Accelerate.framework */; };
+		A15AFBEF2D1616AD00848F45 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */; };
+		A15AFBF12D1616B000848F45 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBF02D1616B000848F45 /* AVFAudio.framework */; };
+		A15AFBF32D1616B400848F45 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBF22D1616B400848F45 /* CoreAudio.framework */; };
 		DC1F5A07206436B20037755F /* ConnectionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1F5A06206436B20037755F /* ConnectionHelper.m */; };
 		F74BEF9C2C1A705600224667 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F74BEF9B2C1A705600224667 /* OpenSSL */; };
 		F74BEFA42C1A80E400224667 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F74BEFA32C1A80E400224667 /* OpenSSL */; };
@@ -212,6 +228,26 @@
 		98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporaryHost.m; path = Database/TemporaryHost.m; sourceTree = "<group>"; };
 		98D5856E1C0ED0E800F6CC00 /* TemporarySettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TemporarySettings.h; path = Database/TemporarySettings.h; sourceTree = "<group>"; };
 		98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporarySettings.m; path = Database/TemporarySettings.m; sourceTree = "<group>"; };
+		A15AFBCF2D1615B200848F45 /* AllocatedAudioBufferList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AllocatedAudioBufferList.h; sourceTree = "<group>"; };
+		A15AFBD02D1615B200848F45 /* AUSpatialMixer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AUSpatialMixer.h; sourceTree = "<group>"; };
+		A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AUSpatialMixer.mm; sourceTree = "<group>"; };
+		A15AFBD22D1615B200848F45 /* CoreAudioHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreAudioHelpers.h; sourceTree = "<group>"; };
+		A15AFBD32D1615B200848F45 /* CoreAudioRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreAudioRenderer.h; sourceTree = "<group>"; };
+		A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreAudioRenderer.mm; sourceTree = "<group>"; };
+		A15AFBD52D1615B200848F45 /* OutputAU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OutputAU.h; sourceTree = "<group>"; };
+		A15AFBD62D1615B200848F45 /* OutputAU.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OutputAU.mm; sourceTree = "<group>"; };
+		A15AFBD72D1615B200848F45 /* TPCircularBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TPCircularBuffer.h; sourceTree = "<group>"; };
+		A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = TPCircularBuffer.c; sourceTree = "<group>"; };
+		A15AFBE22D1615E200848F45 /* Moonlight.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Moonlight.entitlements; sourceTree = "<group>"; };
+		A15AFBE32D16161000848F45 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		A15AFBE52D16161600848F45 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		A15AFBE72D16161A00848F45 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
+		A15AFBE92D16163A00848F45 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A15AFBEB2D16168900848F45 /* Moonlight TV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Moonlight TV.entitlements"; sourceTree = "<group>"; };
+		A15AFBEC2D1616A600848F45 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		A15AFBF02D1616B000848F45 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/AVFAudio.framework; sourceTree = DEVELOPER_DIR; };
+		A15AFBF22D1616B400848F45 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
 		D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Moonlight-Bridging-Header.h"; path = "Input/Moonlight-Bridging-Header.h"; sourceTree = "<group>"; };
 		DC1F5A05206436B10037755F /* ConnectionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionHelper.h; sourceTree = "<group>"; };
 		DC1F5A06206436B20037755F /* ConnectionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionHelper.m; sourceTree = "<group>"; };
@@ -330,12 +366,16 @@
 				9865DC30213260B40005B9B9 /* libmoonlight-common-tv.a in Frameworks */,
 				9865DC3C2132922E0005B9B9 /* GameController.framework in Frameworks */,
 				98882A0D2AF60FA000C5A11C /* libavformat.a in Frameworks */,
+				A15AFBF32D1616B400848F45 /* CoreAudio.framework in Frameworks */,
 				98882A0E2AF60FA300C5A11C /* libavutil.a in Frameworks */,
 				F74BEFA42C1A80E400224667 /* OpenSSL in Frameworks */,
+				A15AFBEF2D1616AD00848F45 /* AudioToolbox.framework in Frameworks */,
 				FB1A67EA21324DF300507771 /* libxml2.tbd in Frameworks */,
+				A15AFBF12D1616B000848F45 /* AVFAudio.framework in Frameworks */,
 				FB1A67E821324DE300507771 /* libopus.a in Frameworks */,
 				98181BEB2791278F00E43572 /* libSDL2.a in Frameworks */,
 				FB1A67E521324A1F00507771 /* CoreData.framework in Frameworks */,
+				A15AFBED2D1616A600848F45 /* Accelerate.framework in Frameworks */,
 				98B9CE6D27B2144B00B473C4 /* AVKit.framework in Frameworks */,
 				98882A0C2AF60F9E00C5A11C /* libavcodec.a in Frameworks */,
 			);
@@ -345,8 +385,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A15AFBEA2D16163A00848F45 /* CoreAudio.framework in Frameworks */,
 				9890CF6B203B7EE1006C4B06 /* libxml2.tbd in Frameworks */,
 				98CFB82F1CAD481B0048EF74 /* libmoonlight-common.a in Frameworks */,
+				A15AFBE82D16161A00848F45 /* AVFAudio.framework in Frameworks */,
 				FB8946ED19F6AFE800339C8A /* libopus.a in Frameworks */,
 				98882A082AF60F7400C5A11C /* libavutil.a in Frameworks */,
 				FB290CF419B2C406004C83CF /* CoreGraphics.framework in Frameworks */,
@@ -356,7 +398,9 @@
 				98882A072AF60F7200C5A11C /* libavformat.a in Frameworks */,
 				FB290CF619B2C406004C83CF /* UIKit.framework in Frameworks */,
 				FB290CF219B2C406004C83CF /* Foundation.framework in Frameworks */,
+				A15AFBE62D16161600848F45 /* AudioToolbox.framework in Frameworks */,
 				FB4679011A57048000377732 /* CoreFoundation.framework in Frameworks */,
+				A15AFBE42D16161100848F45 /* Accelerate.framework in Frameworks */,
 				98181BE92791277400E43572 /* libSDL2.a in Frameworks */,
 				98882A062AF60F7000C5A11C /* libavcodec.a in Frameworks */,
 			);
@@ -382,9 +426,27 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A15AFBD92D1615B200848F45 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				A15AFBCF2D1615B200848F45 /* AllocatedAudioBufferList.h */,
+				A15AFBD02D1615B200848F45 /* AUSpatialMixer.h */,
+				A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */,
+				A15AFBD22D1615B200848F45 /* CoreAudioHelpers.h */,
+				A15AFBD32D1615B200848F45 /* CoreAudioRenderer.h */,
+				A15AFBD42D1615B200848F45 /* CoreAudioRenderer.mm */,
+				A15AFBD52D1615B200848F45 /* OutputAU.h */,
+				A15AFBD62D1615B200848F45 /* OutputAU.mm */,
+				A15AFBD72D1615B200848F45 /* TPCircularBuffer.h */,
+				A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
 		FB1A67542132419700507771 /* Moonlight TV */ = {
 			isa = PBXGroup;
 			children = (
+				A15AFBEB2D16168900848F45 /* Moonlight TV.entitlements */,
 				FB1A675E2132419700507771 /* Main.storyboard */,
 				FB1A67612132419A00507771 /* Assets.xcassets */,
 				FB1A67632132419A00507771 /* Info.plist */,
@@ -403,6 +465,7 @@
 				FB1A67542132419700507771 /* Moonlight TV */,
 				FB290CF019B2C406004C83CF /* Frameworks */,
 				FB290CEF19B2C406004C83CF /* Products */,
+				A15AFBE22D1615E200848F45 /* Moonlight.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -418,6 +481,14 @@
 		FB290CF019B2C406004C83CF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A15AFBF22D1616B400848F45 /* CoreAudio.framework */,
+				A15AFBF02D1616B000848F45 /* AVFAudio.framework */,
+				A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */,
+				A15AFBEC2D1616A600848F45 /* Accelerate.framework */,
+				A15AFBE92D16163A00848F45 /* CoreAudio.framework */,
+				A15AFBE72D16161A00848F45 /* AVFAudio.framework */,
+				A15AFBE52D16161600848F45 /* AudioToolbox.framework */,
+				A15AFBE32D16161000848F45 /* Accelerate.framework */,
 				98882A032AF60F5300C5A11C /* libavcodec.a */,
 				98882A052AF60F5300C5A11C /* libavformat.a */,
 				98882A0A2AF60F9000C5A11C /* libavcodec.a */,
@@ -446,6 +517,7 @@
 			isa = PBXGroup;
 			children = (
 				D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */,
+				A15AFBD92D1615B200848F45 /* Audio */,
 				FB89460419F646E200339C8A /* Crypto */,
 				FB89460919F646E200339C8A /* Input */,
 				FB89460E19F646E200339C8A /* Network */,
@@ -872,6 +944,10 @@
 				FB1A67AB213245C500507771 /* CryptoManager.m in Sources */,
 				FB1A67AF213245C500507771 /* IdManager.m in Sources */,
 				988FCD42293B091B003050E2 /* KeyboardInputField.m in Sources */,
+				A15AFBDA2D1615B200848F45 /* TPCircularBuffer.c in Sources */,
+				A15AFBDB2D1615B200848F45 /* OutputAU.mm in Sources */,
+				A15AFBDC2D1615B200848F45 /* AUSpatialMixer.mm in Sources */,
+				A15AFBDD2D1615B200848F45 /* CoreAudioRenderer.mm in Sources */,
 				FB1A67A3213245BD00507771 /* Connection.m in Sources */,
 				FB1A67A5213245BD00507771 /* StreamConfiguration.m in Sources */,
 				FB1A67A7213245BD00507771 /* StreamManager.m in Sources */,
@@ -894,6 +970,10 @@
 				FB89463419F646E200339C8A /* Utils.m in Sources */,
 				FBDE86E619F82297001C18A8 /* UIAppView.m in Sources */,
 				FB89462F19F646E200339C8A /* Connection.m in Sources */,
+				A15AFBDE2D1615B200848F45 /* TPCircularBuffer.c in Sources */,
+				A15AFBDF2D1615B200848F45 /* OutputAU.mm in Sources */,
+				A15AFBE02D1615B200848F45 /* AUSpatialMixer.mm in Sources */,
+				A15AFBE12D1615B200848F45 /* CoreAudioRenderer.mm in Sources */,
 				FB9AFD321A7D867C00872C98 /* AppAssetRetriever.m in Sources */,
 				FB4678FF1A565DAC00377732 /* WakeOnLanManager.m in Sources */,
 				FB53E1431BE5DC4400CD6ECE /* IdManager.m in Sources */,
@@ -981,10 +1061,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Moonlight TV/Moonlight TV.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1014,7 +1095,7 @@
 				);
 				MARKETING_VERSION = 9.0.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				PRODUCT_BUNDLE_IDENTIFIER = org.hybridized.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Limelight/Input/Moonlight-Bridging-Header.h";
@@ -1036,11 +1117,12 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Moonlight TV/Moonlight TV.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1070,7 +1152,7 @@
 				);
 				MARKETING_VERSION = 9.0.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				PRODUCT_BUNDLE_IDENTIFIER = org.hybridized.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1197,10 +1279,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Moonlight.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Limelight/Limelight-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1229,7 +1312,7 @@
 					"$(PROJECT_DIR)/libs/FFmpeg/lib/iOS-Sim",
 				);
 				MARKETING_VERSION = 9.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				PRODUCT_BUNDLE_IDENTIFIER = org.hybridized.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = NO;
@@ -1247,10 +1330,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Moonlight.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Limelight/Limelight-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1279,7 +1363,7 @@
 					"$(PROJECT_DIR)/libs/FFmpeg/lib/iOS-Sim",
 				);
 				MARKETING_VERSION = 9.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				PRODUCT_BUNDLE_IDENTIFIER = org.hybridized.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = NO;
@@ -1303,7 +1387,7 @@
 				FB1A67672132419A00507771 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		FB290CE919B2C406004C83CF /* Build configuration list for PBXProject "Moonlight" */ = {
 			isa = XCConfigurationList;
@@ -1312,7 +1396,7 @@
 				FB290D1F19B2C406004C83CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		FB290D2019B2C406004C83CF /* Build configuration list for PBXNativeTarget "Moonlight" */ = {
 			isa = XCConfigurationList;
@@ -1321,7 +1405,7 @@
 				FB290D2219B2C406004C83CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 

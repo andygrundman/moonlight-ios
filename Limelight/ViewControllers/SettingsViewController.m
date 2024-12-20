@@ -13,6 +13,8 @@
 #import <VideoToolbox/VideoToolbox.h>
 #import <AVFoundation/AVFoundation.h>
 
+#include <Limelight.h>
+
 @implementation SettingsViewController {
     NSInteger _bitrate;
     NSInteger _lastSelectedResolutionIndex;
@@ -542,7 +544,7 @@ BOOL isCustomResolution(CGSize res) {
                            framerate:framerate
                               height:height
                                width:width
-                         audioConfig:2 // Stereo
+                         audioConfig:2
                     onscreenControls:onscreenControls
                        optimizeGames:optimizeGames
                      multiController:multiController
