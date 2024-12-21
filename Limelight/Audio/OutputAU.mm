@@ -92,14 +92,14 @@ OSStatus renderCallbackDirect(void                       * __nullable inRefCon,
     if ((int)availableBytes < bytesToCopy) {
         // write silence if not enough buffered data is available
         // faster version of memset(targetBuffer, 0, bytesToCopy);
-        memset(targetBuffer, 0, bytesToCopy);
-        //vDSP_vclr(targetBuffer, 1, bytesToCopy);
+        //memset(targetBuffer, 0, bytesToCopy);
+        vDSP_vclr(targetBuffer, 1, bytesToCopy);
         *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
     }
     else {
         // faster version of memcpy(targetBuffer, buffer, MIN(bytesToCopy, (int)availableBytes));
-        memcpy(targetBuffer, buffer, MIN(bytesToCopy, (int)availableBytes));
-        //vDSP_mmov(buffer, targetBuffer, 1, MIN(bytesToCopy, (int)availableBytes), 1, 1);
+        //memcpy(targetBuffer, buffer, MIN(bytesToCopy, (int)availableBytes));
+        vDSP_mmov(buffer, targetBuffer, 1, MIN(bytesToCopy, (int)availableBytes), 1, 1);
         TPCircularBufferConsume(&me->m_RingBuffer, MIN(bytesToCopy, (int)availableBytes));
     }
 

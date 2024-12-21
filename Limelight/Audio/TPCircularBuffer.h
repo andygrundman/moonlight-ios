@@ -43,21 +43,20 @@
 #define TPCircularBuffer_h
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <string.h>
 #include <assert.h>
 
-//#ifdef __cplusplus
-//    extern "C++" {
-//        #include <atomic>
-//        typedef std::atomic_int atomicInt;
-//        #define atomicFetchAdd(a,b) std::atomic_fetch_add(a,b)
-//    }
-//#else
-//    #include <stdatomic.h>
-//    typedef atomic_int atomicInt;
-//    #define atomicFetchAdd(a,b) atomic_fetch_add(a,b)
-//#endif
+#ifdef __cplusplus
+    extern "C++" {
+        #include <atomic>
+        typedef std::atomic_int atomicInt;
+        #define atomicFetchAdd(a,b) std::atomic_fetch_add(a,b)
+    }
+#else
+    #include <stdatomic.h>
+    typedef atomic_int atomicInt;
+    #define atomicFetchAdd(a,b) atomic_fetch_add(a,b)
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,8 +67,7 @@ typedef struct {
     uint32_t           length;
     uint32_t           tail;
     uint32_t           head;
-    //volatile atomicInt fillCount;
-    uint32_t          fillCount;
+    volatile atomicInt fillCount;
     bool              atomic;
 } TPCircularBuffer;
 
@@ -156,7 +154,7 @@ static __inline__ __attribute__((always_inline)) void* TPCircularBufferTail(TPCi
 static __inline__ __attribute__((always_inline)) void TPCircularBufferConsume(TPCircularBuffer *buffer, uint32_t amount) {
     buffer->tail = (buffer->tail + amount) % buffer->length;
     if ( buffer->atomic ) {
-        //atomicFetchAdd(&buffer->fillCount, -(int)amount);
+        atomicFetchAdd(&buffer->fillCount, -(int)amount);
     } else {
         buffer->fillCount -= amount;
     }
@@ -192,7 +190,7 @@ static __inline__ __attribute__((always_inline)) void* TPCircularBufferHead(TPCi
 static __inline__ __attribute__((always_inline)) void TPCircularBufferProduce(TPCircularBuffer *buffer, uint32_t amount) {
     buffer->head = (buffer->head + amount) % buffer->length;
     if ( buffer->atomic ) {
-        //atomicFetchAdd(&buffer->fillCount, (int)amount);
+        atomicFetchAdd(&buffer->fillCount, (int)amount);
     } else {
         buffer->fillCount += amount;
     }

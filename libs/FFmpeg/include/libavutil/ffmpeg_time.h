@@ -1,4 +1,6 @@
 /*
+ * XXX I had to rename this file to fix a broken iOS build, I'm not sure if it is needed by Moonlight or not. -Andy
+ *
  * Copyright (c) 2000-2003 Fabrice Bellard
  *
  * This file is part of FFmpeg.

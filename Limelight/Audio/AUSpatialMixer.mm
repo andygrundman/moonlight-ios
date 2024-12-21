@@ -1,5 +1,4 @@
-//#import <Accelerate/Accelerate.h>
-
+#import <Accelerate/Accelerate.h>
 #import "AUSpatialMixer.h"
 #import "AllocatedAudioBufferList.h"
 
@@ -102,8 +101,8 @@ OSStatus inputCallback(void *inRefCon,
     // Clear the buffer
     for (uint32_t i = 0; i < ioData->mNumberBuffers; i++) {
         // Accelerate version of memset((float *)ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(float));
-        memset((float *)ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(float));
-        //vDSP_vclr((float *)ioData->mBuffers[i].mData, 1, inNumberFrames * sizeof(float));
+        //memset((float *)ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(float));
+        vDSP_vclr((float *)ioData->mBuffers[i].mData, 1, inNumberFrames * sizeof(float));
     }
 
     // Pull audio from playthrough buffer
@@ -121,18 +120,10 @@ OSStatus inputCallback(void *inRefCon,
     }
 
     // de-interleave ringBuffer PCM data into per-channel buffers
-//    const float zero = 0.0f;
-//    for (uint32_t channel = 0; channel < channelCount; channel++) {
-//        float *channelBuffer = (float *)ioData->mBuffers[channel].mData;
-//        vDSP_vsadd(ringBuffer + channel, channelCount, &zero, channelBuffer, 1, inNumberFrames);
-//    }
-
-    // De-interleave ringBuffer PCM data into per-channel buffers using nested loops
+    const float zero = 0.0f;
     for (uint32_t channel = 0; channel < channelCount; channel++) {
         float *channelBuffer = (float *)ioData->mBuffers[channel].mData;
-        for (uint32_t frame = 0; frame < inNumberFrames; frame++) {
-            memcpy(&channelBuffer[frame], &ringBuffer[frame * channelCount + channel], sizeof(float));
-        }
+        vDSP_vsadd(ringBuffer + channel, channelCount, &zero, channelBuffer, 1, inNumberFrames);
     }
 
     TPCircularBufferConsume((TPCircularBuffer *)me->m_RingBufferPtr, wantedBytes);
