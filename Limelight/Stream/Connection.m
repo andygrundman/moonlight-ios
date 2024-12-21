@@ -215,9 +215,6 @@ int ArInit(int audioConfiguration, POPUS_MULTISTREAM_CONFIGURATION opusConfig, v
 
     [audioRenderer start];
 
-    // Disable lowering volume of other audio streams
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
-
     return 0;
 }
 
@@ -241,7 +238,6 @@ void ArDecodeAndPlaySample(char* sampleData, int sampleLength)
         return;
     }
 
-    CFTimeInterval now = CACurrentMediaTime();
     if (!currentAudioStats.startTime) {
         currentAudioStats.startTime = CACurrentMediaTime();
     }

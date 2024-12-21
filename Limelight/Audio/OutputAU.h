@@ -22,7 +22,9 @@ public:
     bool prepareForPlayback(const OPUS_MULTISTREAM_CONFIGURATION* opusConfig);
     bool initAudioUnit();
     bool initRingBuffer();
+
     AUSpatialMixerOutputType getSpatialMixerOutputType();
+    NSString *getSMOTString(AUSpatialMixerOutputType type);
 
     void setCallback(void * context, AURenderCallback callback);
     void *getAudioBuffer(int *size);
@@ -33,6 +35,7 @@ public:
     bool stop();
     bool isSpatial();
     OSStatus setOutputType(AUSpatialMixerOutputType outputType);
+    void setNeedsReinit(bool value);
 
     friend OSStatus renderCallbackSpatial(void *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, uint32_t, uint32_t, AudioBufferList *);
     friend OSStatus renderCallbackDirect(void *, AudioUnitRenderActionFlags *, const AudioTimeStamp *, uint32_t, uint32_t, AudioBufferList *);
@@ -42,7 +45,7 @@ private:
     AUSpatialMixer m_SpatialAU;
 
     // input stream metadata from opusConfig
-    int m_sampleRate;
+    double m_sampleRate;
     int m_channelCount;
     int m_samplesPerFrame;
 

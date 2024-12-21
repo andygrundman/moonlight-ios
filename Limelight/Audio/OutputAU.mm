@@ -52,7 +52,7 @@ OSStatus renderCallbackSpatial(void                       * __nullable inRefCon,
                                uint32_t                       inNumberFrames,
                                AudioBufferList            * __nullable ioData)
 {
-    OutputAU *me = (OutputAU *)inRefCon;
+    auto me = static_cast<OutputAU *>(inRefCon);
     AudioBufferList *spatialBuffer = me->m_SpatialBuffer.get();
 
     // Set the byte size with the output audio buffer list.
@@ -81,7 +81,7 @@ OSStatus renderCallbackDirect(void                       * __nullable inRefCon,
                               uint32_t                       inNumberFrames,
                               AudioBufferList            * __nullable ioData)
 {
-    OutputAU *me = (OutputAU *)inRefCon;
+    auto me = static_cast<OutputAU *>(inRefCon);
     int bytesToCopy = ioData->mBuffers[0].mDataByteSize;
     float *targetBuffer = (float *)ioData->mBuffers[0].mData;
 
@@ -115,7 +115,7 @@ bool OutputAU::prepareForPlayback(const OPUS_MULTISTREAM_CONFIGURATION* opusConf
     m_samplesPerFrame = opusConfig->samplesPerFrame;
 
     // Request the OS set our buffer close to the Opus packet size
-    m_AudioPacketDuration = (m_samplesPerFrame / (m_sampleRate / 1000)) / 1000.0;
+    m_AudioPacketDuration = (m_samplesPerFrame / (m_sampleRate / 1000.0)) / 1000.0;
 
     if (!initAudioUnit()) {
         DEBUG_TRACE(@"initAudioUnit failed");
@@ -127,11 +127,24 @@ bool OutputAU::prepareForPlayback(const OPUS_MULTISTREAM_CONFIGURATION* opusConf
         return false;
     }
 
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    int physicalOutputChannels = (int)[session maximumOutputNumberOfChannels];
+
     AUSpatialMixerOutputType outputType = getSpatialMixerOutputType();
-    DEBUG_TRACE(@"OutputAU getSpatialMixerOutputType = %d", outputType);
+    Log(LOG_I, @"OutputAU spatial mixer output type %@ with %d physical channels",
+        getSMOTString(outputType), physicalOutputChannels);
 
     m_isSpatial = false;
     if (m_channelCount > 2) {
+        if (physicalOutputChannels >= m_channelCount) {
+            NSError *error = nil;
+            Log(LOG_I, @"Multichannel output is available, will use passthrough mode");
+            [session setPreferredOutputNumberOfChannels:m_channelCount error:&error];
+            if (error != nil) {
+                Log(LOG_W, @"Warning: failed to set preferred output number of channels to %d: %@", m_channelCount, error.localizedDescription);
+                // probably ok to continue
+            }
+        }
         if (outputType != kSpatialMixerOutputType_ExternalSpeakers) {
             m_isSpatial = true;
         }
@@ -155,7 +168,7 @@ bool OutputAU::prepareForPlayback(const OPUS_MULTISTREAM_CONFIGURATION* opusConf
         streamDesc.mBytesPerPacket = 4;
         streamDesc.mBytesPerFrame  = 4;
 
-        if (!m_SpatialAU.setup(outputType, m_sampleRate * 1.0, getSampleRate(), m_channelCount)) {
+        if (!m_SpatialAU.setup(outputType, m_sampleRate, getSampleRate(), m_channelCount)) {
             DEBUG_TRACE(@"m_SpatialAU.setup failed");
             return false;
         }
@@ -358,8 +371,30 @@ bool OutputAU::initAudioUnit()
         m_OutputHardwareLatency = (double)latencyFrames / m_OutputASBD.mSampleRate;
         DEBUG_TRACE(@"OutputAU output hardware latency: %d (%0.2f ms)", latencyFrames, m_OutputHardwareLatency * 1000.0);
     }
+#else
+    // iOS hardware latency
+    {
+        m_OutputHardwareLatency = [[AVAudioSession sharedInstance] outputLatency];
+        DEBUG_TRACE(@"OutputAU output hardware latency: %d (%0.2f ms)", (int)(m_OutputHardwareLatency * m_sampleRate), m_OutputHardwareLatency * 1000.0);
+    }
+
+    // iOS preferred buffer size
+    {
+        NSError *error = nil;
+        [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:m_AudioPacketDuration error:&error];
+        if (error != nil) {
+            CA_LogError(-1, "failed to set preferred buffer duration to %f: %@", m_AudioPacketDuration, error.localizedDescription);
+            return false;
+        }
+
+        // see what we got
+        double bufferDuration = [[AVAudioSession sharedInstance] IOBufferDuration];
+        m_TotalSoftwareLatency += bufferDuration;
+        DEBUG_TRACE(@"OutputAU output now has actual IOBufferDuration of %d (%0.3f ms)", (int)(bufferDuration * m_sampleRate), bufferDuration * 1000.0);
+    }
 #endif
 
+    // The time, in seconds, that it takes an audio unit to move an audio sample from its input to its output.
     {
         double audioUnitLatency = 0.0;
         uint32_t size = sizeof(audioUnitLatency);
@@ -460,10 +495,12 @@ AUSpatialMixerOutputType OutputAU::getSpatialMixerOutputType()
     }
     else {
         NSString* pType = audioSession.currentRoute.outputs.firstObject.portType;
+        DEBUG_TRACE(@"OutputAU current route port type %@", pType);
         if (   [pType isEqualToString:AVAudioSessionPortHeadphones]
             || [pType isEqualToString:AVAudioSessionPortBluetoothA2DP]
             || [pType isEqualToString:AVAudioSessionPortBluetoothLE]
-            || [pType isEqualToString:AVAudioSessionPortBluetoothHFP])
+            || [pType isEqualToString:AVAudioSessionPortBluetoothHFP]
+            || [pType isEqualToString:AVAudioSessionPortUSBAudio])
         {
             return kSpatialMixerOutputType_Headphones;
         }
@@ -476,6 +513,20 @@ AUSpatialMixerOutputType OutputAU::getSpatialMixerOutputType()
     }
 
 #endif
+}
+
+static NSString * const SMOT[] = {
+    [kSpatialMixerOutputType_Headphones] = @"Headphones",
+    [kSpatialMixerOutputType_BuiltInSpeakers] = @"BuiltInSpeakers",
+    [kSpatialMixerOutputType_ExternalSpeakers] = @"ExternalSpeakers"
+};
+
+NSString *OutputAU::getSMOTString(AUSpatialMixerOutputType type)
+{
+    if (type >= 1 && type <= 3) {
+        return SMOT[type];
+    }
+    return @"Unknown";
 }
 
 void OutputAU::setCallback(void *context, AURenderCallback callback)
@@ -574,4 +625,9 @@ bool OutputAU::isSpatial()
 OSStatus OutputAU::setOutputType(AUSpatialMixerOutputType outputType)
 {
     return m_SpatialAU.setOutputType(outputType);
+}
+
+void OutputAU::setNeedsReinit(bool value)
+{
+    m_needsReinit = value;
 }

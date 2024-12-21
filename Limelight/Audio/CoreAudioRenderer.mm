@@ -7,12 +7,14 @@
 @implementation CoreAudioRenderer
 {
     OutputAU m_OutputAU;
+    bool hasPlayedAudio;
 }
 
 -(instancetype)initWithConfig:(const OPUS_MULTISTREAM_CONFIGURATION *)opusConfig
 {
     self = [super init];
 
+    hasPlayedAudio = false;
     m_OutputAU.stop();
 
     if (!m_OutputAU.prepareForPlayback(opusConfig)) {
@@ -49,6 +51,28 @@
 
 -(BOOL)submitAudio:(int)bytesWritten
 {
+    if (!hasPlayedAudio) {
+        hasPlayedAudio = true;
+
+        // On first audio, set some audio session things:
+        // Disable lowering volume of other audio streams
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        [session setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+
+#if TARGET_OS_VISION
+        if (m_OutputAU.isSpatial()) {
+            // define how our spatial audio works for Vision Pro:
+            // XXX user can choose between FixedSpatialExperience or HeadTrackedSpatialExperience
+            NSError *error;
+            [session setIntendedSpatialExperience:AVAudioSessionSpatialExperienceHeadTracked options:@{
+                @"AVAudioSessionSpatialExperienceOptionSoundStageSize" : AVAudioSessionSoundStageSizeLarge
+                @"AVAudioSessionSpatialExperienceOptionAnchoringStrategy" : AVAudioSessionAnchoringStrategyFront
+            } error:&error];
+        }
+#endif
+
+    }
+
     return m_OutputAU.submitAudio(bytesWritten);
 }
 
@@ -60,9 +84,12 @@
 {
     if (m_OutputAU.isSpatial()) {
         AUSpatialMixerOutputType outputType = m_OutputAU.getSpatialMixerOutputType();
-        DEBUG_TRACE(@"CoreAudioRenderer handleRouteChange, getSpatialMixerOutputType = %d", outputType);
+        Log(LOG_I, @"CoreAudioRenderer route change -> %@", m_OutputAU.getSMOTString(outputType));
         m_OutputAU.setOutputType(outputType);
     }
+
+    // always reinit on a change
+    m_OutputAU.setNeedsReinit(true);
 }
 
 @end

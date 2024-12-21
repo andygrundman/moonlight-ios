@@ -5,7 +5,7 @@
 #if DEBUG
 # define DEBUG_TRACE(...) Log(LOG_I, __VA_ARGS__)
 #else
-# define DEBUG_TRACE(...)
+# define DEBUG_TRACE(...) do {} while (0) // no-op
 #endif
 
 #ifdef __cplusplus
