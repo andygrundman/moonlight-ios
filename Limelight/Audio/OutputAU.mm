@@ -755,7 +755,6 @@ void OutputAU::refreshDeviceProperties() {
                     isSpatialAudioEnabled, supportsMultichannelContent);
         DEBUG_TRACE(@"currentRoute: %@", currentRoute);
         DEBUG_TRACE(@"channels: %@", outputPort.channels);
-        DEBUG_TRACE(@"renderingMode: %@", session.renderingMode);
     }
 
 //    DEBUG_TRACE(@"inputChannels %d, maximumOutputNumberOfChannels %d, mode %@, renderingMode %@, supportsMultichannelContent %@",

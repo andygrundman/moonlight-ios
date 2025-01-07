@@ -182,6 +182,24 @@ static AVSampleBufferRenderSynchronizer *renderSynchronizerInstance;
         DEBUG_TRACE(@"AVSB setPreferredIOBufferDuration %f", _opus.frameDuration);
     }
 
+#if TARGET_OS_VISION
+    {
+        // define the spatial rendering for VisionOS
+
+        // AVAudioSessionSpatialExperienceHeadTracked, AVAudioSessionSpatialExperienceFixed, AVAudioSessionSpatialExperienceBypassed
+        [session setIntendedSpatialExperience:AVAudioSessionSpatialExperienceFixed options:@{
+            // SoundStageSize can be AVAudioSessionSoundStageSizeAutomatic, Small, Medium, Large
+            @"AVAudioSessionSpatialExperienceOptionSoundStageSize" : @(AVAudioSessionSoundStageSizeLarge),
+            // AVAudioSessionAnchoringStrategyAutomatic, AVAudioSessionAnchoringStrategyScene, AVAudioSessionAnchoringStrategyFront
+            @"AVAudioSessionSpatialExperienceOptionAnchoringStrategy" : @(AVAudioSessionAnchoringStrategyFront)
+        } error:&error];
+        DEBUG_TRACE(@"AVSB setIntendedSpatialExperience");
+        if (error != nil) {
+            CA_LogError(-1, "AVSB failed to setIntendedSpatialExperience: %@", error.localizedDescription);
+        }
+    }
+#endif
+
     // multichannel (non-spatial HDMI devices)
     if (_opus.channels > 2) {
         bool isSpatialAudioEnabled = false;
@@ -568,6 +586,7 @@ static AVSampleBufferRenderSynchronizer *renderSynchronizerInstance;
                 if ([output.portType isEqualToString:AVAudioSessionPortHeadphones]) {
                     // headphonesConnected = YES;
                 }
+                DEBUG_TRACE(@"AVSB AVAudioSessionRouteChangeReasonNewDeviceAvailable: %@, isSpatialAudioEnabled: %@", output.portType, output.isSpatialAudioEnabled);
             }
             break;
         }
@@ -579,6 +598,7 @@ static AVSampleBufferRenderSynchronizer *renderSynchronizerInstance;
                     if ([output.portType isEqualToString:AVAudioSessionPortHeadphones]) {
                         // headphonesConnected = NO;
                     }
+                    DEBUG_TRACE(@"AVSB AVAudioSessionRouteChangeReasonOldDeviceUnavailable: %@", output.portType);
                 }
             }
             break;
@@ -587,6 +607,8 @@ static AVSampleBufferRenderSynchronizer *renderSynchronizerInstance;
         default:
             break;
     }
+
+    _needsReinit = true;
 }
 
 -(void)handleResetNotification:(NSNotification *)notification
@@ -602,46 +624,6 @@ static AVSampleBufferRenderSynchronizer *renderSynchronizerInstance;
     NSValue *flushTime = [notification.userInfo objectForKey:AVSampleBufferAudioRendererFlushTimeKey];
     double time = CMTimeGetSeconds(flushTime.CMTimeValue);
     Log(LOG_I, @"AVSB renderer flush: at %f, time %f", time, CMTimeGetSeconds(_renderSynchronizer.currentTime));
-}
-
--(void)handleRenderingCapabilitiesChange:(NSNotification *)notification
-{
-    DEBUG_TRACE(@"Got renderingCapabilitiesChange notification");
-
-    if (@available(iOS 17.2, tvOS 17.2, *)) {
-        // this callback can indicate available channel layouts when using AirPlay
-        // Perhaps not very useful to us but interesting to catch anyway
-        AVAudioSession *session = [AVAudioSession sharedInstance];
-        NSArray<AVAudioChannelLayout *> *layouts = [session supportedOutputChannelLayouts];
-
-        for (AVAudioChannelLayout *layout in layouts) {
-            //AudioChannelLayoutTag layoutTag = layout.layoutTag;
-
-            // Print information about each layout
-            DEBUG_TRACE(@"Supported layout: %@", layout);
-        }
-    }
-}
-
--(void)handleRenderingModeChange:(NSNotification *)notification
-{
-    DEBUG_TRACE(@"Got renderingModeChange notification");
-
-    if (@available(iOS 17.2, tvOS 17.2, *)) {
-        // this callback can indicate available channel layouts when using AirPlay
-        // Perhaps not very useful to us but interesting to catch anyway
-        AVAudioSession *session = [AVAudioSession sharedInstance];
-        AVAudioSessionRenderingMode renderingMode = [session renderingMode];
-
-        /*   AVAudioSessionRenderingModeNotApplicable           = 0,
-             AVAudioSessionRenderingModeMonoStereo              = 1,
-             AVAudioSessionRenderingModeSurround                = 2,
-             AVAudioSessionRenderingModeSpatialAudio            = 3,
-             AVAudioSessionRenderingModeDolbyAudio              = 4,
-             AVAudioSessionRenderingModeDolbyAtmos              = 5, */
-
-        DEBUG_TRACE(@"Rendering Mode: %ld", (long)renderingMode);
-    }
 }
 
 // update rate is based on how often we're called

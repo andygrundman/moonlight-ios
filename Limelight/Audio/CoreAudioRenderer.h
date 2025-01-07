@@ -12,8 +12,6 @@
 - (BOOL)submitAudio:(int)bytesWritten opusBytes:(int)opusBytes decodeStartTime:(CFTimeInterval)decodeStartTime;
 - (NSString *)getAudioStatsString;
 - (void)handleRouteChange:(NSNotification *)notification;
-- (void)handleRenderingCapabilitiesChange:(NSNotification *)notification;
-- (void)handleRenderingModeChange:(NSNotification *)notification;
 
 @end
 
