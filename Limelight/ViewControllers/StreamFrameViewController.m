@@ -47,7 +47,10 @@
     UIScrollView *_scrollView;
     BOOL _userIsInteracting;
     CGSize _keyboardSize;
-    
+    UIWindow *_extWindow;
+    UIView *_renderView;
+    UIWindow *_deviceWindow;
+
 #if !TARGET_OS_TV
     UIScreenEdgePanGestureRecognizer *_exitSwipeRecognizer;
 #endif
@@ -56,7 +59,30 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
+    _deviceWindow = self.view.window;
+
+    if (UIScreen.screens.count > 1) {
+        [self prepExtScreen:UIScreen.screens.lastObject];
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.view insertSubview:self->_renderView atIndex:0];
+        });
+    }
+
+    // check to see if external screen is connected/disconnected
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(extScreenDidConnect:)
+                                                 name: UIScreenDidConnectNotification
+                                               object: nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(extScreenDidDisconnect:)
+                                                 name: UIScreenDidDisconnectNotification
+                                               object: nil];
+
 #if !TARGET_OS_TV
     [[self revealViewController] setPrimaryViewController:self];
 #endif
@@ -106,7 +132,10 @@
     
     _controllerSupport = [[ControllerSupport alloc] initWithConfig:self.streamConfig delegate:self];
     _inactivityTimer = nil;
-    
+
+    _renderView = (StreamView*)[[UIView alloc] initWithFrame:self.view.frame];
+    _renderView.bounds = _streamView.bounds;
+
     _streamView = [[StreamView alloc] initWithFrame:self.view.frame];
     [_streamView setupStreamView:_controllerSupport interactionDelegate:self config:self.streamConfig];
     
@@ -152,7 +181,7 @@
     _tipLabel.center = CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 0.9);
     
     _streamMan = [[StreamManager alloc] initWithConfig:self.streamConfig
-                                            renderView:_streamView
+                                            renderView:_renderView
                                    connectionCallbacks:self];
     NSOperationQueue* opQueue = [[NSOperationQueue alloc] init];
     [opQueue addOperation:_streamMan];
@@ -313,6 +342,51 @@
     _statsUpdateTimer = nil;
     
     [self.navigationController popToRootViewControllerAnimated:YES];
+    _extWindow = nil;
+}
+
+// External Screen connected
+- (void)extScreenDidConnect:(NSNotification *)notification {
+    Log(LOG_I, @"External Screen Connected");
+    dispatch_async(dispatch_get_main_queue(), ^{
+    [self prepExtScreen:notification.object];
+    });
+}
+
+// External Screen disconnected
+- (void)extScreenDidDisconnect:(NSNotification *)notification {
+    Log(LOG_I, @"External Screen Disconnected");
+    if(UIScreen.screens.count < 2)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+        [self removeExtScreen];
+        });
+    }
+}
+
+// Prepare Screen
+- (void)prepExtScreen:(UIScreen*)extScreen {
+    Log(LOG_I, @"Preparing External Screen");
+    CGRect frame = extScreen.bounds;
+    extScreen.overscanCompensation = 3;
+    _extWindow = [[UIWindow alloc] initWithFrame:frame];
+    _extWindow.screen = extScreen;
+    _renderView.bounds = frame;
+    _renderView.frame = frame;
+    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    [nc postNotificationName:@"ScreenConnected" object:self];
+    [_extWindow addSubview:_renderView];
+    _extWindow.hidden = NO;
+}
+
+- (void)removeExtScreen {
+    Log(LOG_I, @"Removing External Screen");
+    _extWindow.hidden = YES;
+    _renderView.bounds = _deviceWindow.bounds;
+    _renderView.frame = _deviceWindow.frame;
+    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    [nc postNotificationName:@"ScreenDisconnected" object:self];
+    [self.view insertSubview:_renderView atIndex:0];
 }
 
 // This will fire if the user opens control center or gets a low battery message
@@ -370,13 +444,12 @@
 - (void) connectionStarted {
     Log(LOG_I, @"Connection started");
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Leave the spinner spinning until it's obscured by
-        // the first frame of video.
         self->_stageLabel.hidden = YES;
         self->_tipLabel.hidden = YES;
         
         [self->_streamView showOnScreenControls];
-        
+        //self.spinner.hidden = YES;
+
         [self->_controllerSupport connectionEstablished];
         
         if (self->_settings.statsOverlay) {
@@ -471,8 +544,8 @@
 }
 
 - (void) stageStarting:(const char*)stageName {
-    Log(LOG_I, @"Starting %s", stageName);
     dispatch_async(dispatch_get_main_queue(), ^{
+        Log(LOG_I, @"Starting %s", stageName);
         NSString* lowerCase = [NSString stringWithFormat:@"%s in progress...", stageName];
         NSString* titleCase = [[[lowerCase substringToIndex:1] uppercaseString] stringByAppendingString:[lowerCase substringFromIndex:1]];
         [self->_stageLabel setText:titleCase];
