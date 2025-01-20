@@ -41,6 +41,12 @@
 		98CFB82F1CAD481B0048EF74 /* libmoonlight-common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98AB2E841CAD46840089BB98 /* libmoonlight-common.a */; };
 		98D5856D1C0EA79600F6CC00 /* TemporaryHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */; };
 		98D585701C0ED0E800F6CC00 /* TemporarySettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */; };
+		A1DEE1602D3AC9CD009145F4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DEE15F2D3AC9CD009145F4 /* SceneDelegate.m */; };
+		A1DEE1612D3AC9CD009145F4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DEE15F2D3AC9CD009145F4 /* SceneDelegate.m */; };
+		A1DEE1652D3ADB13009145F4 /* ExternalSceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DEE1642D3ADB10009145F4 /* ExternalSceneDelegate.m */; };
+		A1DEE1662D3ADB13009145F4 /* ExternalSceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DEE1642D3ADB10009145F4 /* ExternalSceneDelegate.m */; };
+		A1DEE1692D3D9098009145F4 /* ExternalStreamFrameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DEE1682D3D9097009145F4 /* ExternalStreamFrameViewController.m */; };
+		A1DEE16A2D3D9098009145F4 /* ExternalStreamFrameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DEE1682D3D9097009145F4 /* ExternalStreamFrameViewController.m */; };
 		DC1F5A07206436B20037755F /* ConnectionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1F5A06206436B20037755F /* ConnectionHelper.m */; };
 		F74BEF9C2C1A705600224667 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F74BEF9B2C1A705600224667 /* OpenSSL */; };
 		F74BEFA42C1A80E400224667 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F74BEFA32C1A80E400224667 /* OpenSSL */; };
@@ -212,6 +218,12 @@
 		98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporaryHost.m; path = Database/TemporaryHost.m; sourceTree = "<group>"; };
 		98D5856E1C0ED0E800F6CC00 /* TemporarySettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TemporarySettings.h; path = Database/TemporarySettings.h; sourceTree = "<group>"; };
 		98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporarySettings.m; path = Database/TemporarySettings.m; sourceTree = "<group>"; };
+		A1DEE15F2D3AC9CD009145F4 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		A1DEE1622D3ACA45009145F4 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		A1DEE1632D3ADB07009145F4 /* ExternalSceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExternalSceneDelegate.h; sourceTree = "<group>"; };
+		A1DEE1642D3ADB10009145F4 /* ExternalSceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExternalSceneDelegate.m; sourceTree = "<group>"; };
+		A1DEE1672D3D9086009145F4 /* ExternalStreamFrameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExternalStreamFrameViewController.h; sourceTree = "<group>"; };
+		A1DEE1682D3D9097009145F4 /* ExternalStreamFrameViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExternalStreamFrameViewController.m; sourceTree = "<group>"; };
 		D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Moonlight-Bridging-Header.h"; path = "Input/Moonlight-Bridging-Header.h"; sourceTree = "<group>"; };
 		DC1F5A05206436B10037755F /* ConnectionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionHelper.h; sourceTree = "<group>"; };
 		DC1F5A06206436B20037755F /* ConnectionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionHelper.m; sourceTree = "<group>"; };
@@ -469,6 +481,10 @@
 				FB1D59961BBCCB6400F482CA /* ComputerScrollView.m */,
 				FB1D59981BBCCD7E00F482CA /* AppCollectionView.h */,
 				FB1D59991BBCCD7E00F482CA /* AppCollectionView.m */,
+				A1DEE1622D3ACA45009145F4 /* SceneDelegate.h */,
+				A1DEE15F2D3AC9CD009145F4 /* SceneDelegate.m */,
+				A1DEE1632D3ADB07009145F4 /* ExternalSceneDelegate.h */,
+				A1DEE1642D3ADB10009145F4 /* ExternalSceneDelegate.m */,
 			);
 			name = Moonlight;
 			path = Limelight;
@@ -569,6 +585,8 @@
 		FB89462319F646E200339C8A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				A1DEE1672D3D9086009145F4 /* ExternalStreamFrameViewController.h */,
+				A1DEE1682D3D9097009145F4 /* ExternalStreamFrameViewController.m */,
 				FBD3495119FF36FB002D2A60 /* SWRevealViewController.h */,
 				FBD3495219FF36FB002D2A60 /* SWRevealViewController.m */,
 				FB89462419F646E200339C8A /* MainFrameViewController.h */,
@@ -837,6 +855,7 @@
 				9865DC36213287F30005B9B9 /* AppDelegate.m in Sources */,
 				FB1A6819213284FB00507771 /* UIComputerView.m in Sources */,
 				FB1A681A213284FB00507771 /* UIAppView.m in Sources */,
+				A1DEE1612D3AC9CD009145F4 /* SceneDelegate.m in Sources */,
 				FB1A681B213284FB00507771 /* ComputerScrollView.m in Sources */,
 				FB1A681C213284FB00507771 /* AppCollectionView.m in Sources */,
 				9865DC37213287FE0005B9B9 /* StreamFrameViewController.m in Sources */,
@@ -844,6 +863,7 @@
 				9865DC31213260F10005B9B9 /* mkcert.c in Sources */,
 				FB1A67E32132498A00507771 /* Limelight.xcdatamodeld in Sources */,
 				FB1A67DE2132460A00507771 /* Utils.m in Sources */,
+				A1DEE1662D3ADB13009145F4 /* ExternalSceneDelegate.m in Sources */,
 				FB1A67E02132460A00507771 /* Logger.m in Sources */,
 				FB1A67D52132460400507771 /* ControllerSupport.m in Sources */,
 				FB1A67D82132460400507771 /* StreamView.m in Sources */,
@@ -854,6 +874,7 @@
 				FB1A67CF213245F800507771 /* TemporaryApp.m in Sources */,
 				FB1A67D1213245F800507771 /* TemporaryHost.m in Sources */,
 				FB1A67D3213245F800507771 /* TemporarySettings.m in Sources */,
+				A1DEE16A2D3D9098009145F4 /* ExternalStreamFrameViewController.m in Sources */,
 				FB1A67C3213245EA00507771 /* AppAssetManager.m in Sources */,
 				FB1A67C5213245EA00507771 /* AppAssetRetriever.m in Sources */,
 				FB1A67C7213245EA00507771 /* PairManager.m in Sources */,
@@ -891,6 +912,7 @@
 				FB89463219F646E200339C8A /* VideoDecoderRenderer.m in Sources */,
 				FB290D0419B2C406004C83CF /* AppDelegate.m in Sources */,
 				FB9AFD401A7E127D00872C98 /* AppListResponse.m in Sources */,
+				A1DEE1692D3D9098009145F4 /* ExternalStreamFrameViewController.m in Sources */,
 				FB89463419F646E200339C8A /* Utils.m in Sources */,
 				FBDE86E619F82297001C18A8 /* UIAppView.m in Sources */,
 				FB89462F19F646E200339C8A /* Connection.m in Sources */,
@@ -911,6 +933,7 @@
 				FB4678FA1A55FFAD00377732 /* DiscoveryManager.m in Sources */,
 				98D5856D1C0EA79600F6CC00 /* TemporaryHost.m in Sources */,
 				FB89463519F646E200339C8A /* MainFrameViewController.m in Sources */,
+				A1DEE1602D3AC9CD009145F4 /* SceneDelegate.m in Sources */,
 				FBD1C8E21A8AD71400C6703C /* Logger.m in Sources */,
 				FB1D599A1BBCCD7E00F482CA /* AppCollectionView.m in Sources */,
 				FB89463619F646E200339C8A /* StreamFrameViewController.m in Sources */,
@@ -921,6 +944,7 @@
 				DC1F5A07206436B20037755F /* ConnectionHelper.m in Sources */,
 				FB89462E19F646E200339C8A /* PairManager.m in Sources */,
 				FB9AFD371A7E02DB00872C98 /* HttpRequest.m in Sources */,
+				A1DEE1652D3ADB13009145F4 /* ExternalSceneDelegate.m in Sources */,
 				FB4678ED1A50C40900377732 /* OnScreenControls.m in Sources */,
 				FB290D0019B2C406004C83CF /* main.m in Sources */,
 				9896219723D15C7000211983 /* X1Kit.swift in Sources */,
@@ -984,7 +1008,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1022,7 +1046,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Debug;
 		};
@@ -1040,7 +1064,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1078,7 +1102,7 @@
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "Moonlight-Swift.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Release;
 		};
@@ -1200,7 +1224,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Limelight/Limelight-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1212,6 +1236,7 @@
 				);
 				INFOPLIST_FILE = "Limelight/Limelight-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1250,7 +1275,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Limelight/Limelight-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1262,6 +1287,7 @@
 				);
 				INFOPLIST_FILE = "Limelight/Limelight-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

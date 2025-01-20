@@ -436,7 +436,16 @@ static NSMutableSet* hostList;
 }
 
 - (UIViewController*) activeViewController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    UIWindow *keyWindow = nil;
+    for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        for (UIWindow *window in scene.windows) {
+            if (window.isKeyWindow) {
+                keyWindow = window;
+                break;
+            }
+        }
+    }
+    UIViewController *topController = keyWindow.rootViewController;
 
     while (topController.presentedViewController) {
         topController = topController.presentedViewController;
@@ -643,17 +652,15 @@ static NSMutableSet* hostList;
     // multiController must be set before calling getConnectedGamepadMask
     _streamConfig.multiController = streamSettings.multiController;
     _streamConfig.gamepadMask = [ControllerSupport getConnectedGamepadMask:_streamConfig];
-    
-    // Probe for supported channel configurations
-    int physicalOutputChannels = (int)[AVAudioSession sharedInstance].maximumOutputNumberOfChannels;
-    Log(LOG_I, @"Audio device supports %d channels", physicalOutputChannels);
-    
-    int numberOfChannels = MIN([streamSettings.audioConfig intValue], physicalOutputChannels);
+
+    // Allow any audio channel config, we'll assume if it doesn't match maximumOutputNumberOfChannels
+    // that it will be rendered as spatial audio
+    int numberOfChannels = [streamSettings.audioConfig intValue];
     Log(LOG_I, @"Selected number of audio channels %d", numberOfChannels);
-    if (numberOfChannels >= 8) {
+    if (numberOfChannels == 8) {
         _streamConfig.audioConfiguration = AUDIO_CONFIGURATION_71_SURROUND;
     }
-    else if (numberOfChannels >= 6) {
+    else if (numberOfChannels == 6) {
         _streamConfig.audioConfiguration = AUDIO_CONFIGURATION_51_SURROUND;
     }
     else {

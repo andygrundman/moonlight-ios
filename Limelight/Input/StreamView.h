@@ -25,6 +25,7 @@
 #endif
 
 - (void) setupStreamView:(ControllerSupport*)controllerSupport
+       withExternalScene:(UIWindowScene *)externalScene
      interactionDelegate:(id<UserInteractionDelegate>)interactionDelegate
                   config:(StreamConfiguration*)streamConfig;
 - (void) showOnScreenControls;

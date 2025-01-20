@@ -191,8 +191,10 @@ BOOL isCustomResolution(CGSize res) {
     // Only show the 120 FPS option if we have a > 60-ish Hz display
     bool enable120Fps = false;
     if (@available(iOS 10.3, tvOS 10.3, *)) {
-        if ([UIScreen mainScreen].maximumFramesPerSecond > 62) {
-            enable120Fps = true;
+        for (UIScreen *screen in [UIScreen screens]) {
+            if (screen.maximumFramesPerSecond > 62) {
+                enable120Fps = true;
+            }
         }
     }
     if (!enable120Fps) {
@@ -410,7 +412,7 @@ BOOL isCustomResolution(CGSize res) {
         [self updateResolutionDisplayViewText];
         self->_lastSelectedResolutionIndex = [self.resolutionSelector selectedSegmentIndex];
         
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Custom Resolution Selected" message: @"Custom resolutions are not officially supported by GeForce Experience, so it will not set your host display resolution. You will need to set it manually while in game.\n\nResolutions that are not supported by your client or host PC may cause streaming errors." preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Custom Resolution Selected" message: @"Resolutions that are not supported by your client or host PC may cause streaming errors." preferredStyle:UIAlertControllerStyleAlert];
         [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
         [self presentViewController:alertController animated:YES completion:nil];
     }]];
@@ -542,7 +544,7 @@ BOOL isCustomResolution(CGSize res) {
                            framerate:framerate
                               height:height
                                width:width
-                         audioConfig:2 // Stereo
+                         audioConfig:2
                     onscreenControls:onscreenControls
                        optimizeGames:optimizeGames
                      multiController:multiController

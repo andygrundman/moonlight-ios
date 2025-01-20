@@ -11,7 +11,10 @@
 
 @interface StreamManager : NSOperation
 
-- (id) initWithConfig:(StreamConfiguration*)config renderView:(UIView*)view connectionCallbacks:(id<ConnectionCallbacks>)callback;
+- (id) initWithConfig:(StreamConfiguration*)config
+    withExternalScene:(UIWindowScene *)externalScene
+           renderView:(UIView*)view
+  connectionCallbacks:(id<ConnectionCallbacks>)callback;
 
 - (void) stopStream;
 

@@ -47,9 +47,11 @@
     UIScrollView *_scrollView;
     BOOL _userIsInteracting;
     CGSize _keyboardSize;
+
+    UIWindowScene *_mainScene;
+    UIWindowScene *_externalScene;
     UIWindow *_extWindow;
     UIView *_renderView;
-    UIWindow *_deviceWindow;
 
 #if !TARGET_OS_TV
     UIScreenEdgePanGestureRecognizer *_exitSwipeRecognizer;
@@ -60,28 +62,7 @@
 {
     [super viewDidAppear:animated];
 
-    _deviceWindow = self.view.window;
-
-    if (UIScreen.screens.count > 1) {
-        [self prepExtScreen:UIScreen.screens.lastObject];
-    }
-    else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.view insertSubview:self->_renderView atIndex:0];
-        });
-    }
-
-    // check to see if external screen is connected/disconnected
-
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(extScreenDidConnect:)
-                                                 name: UIScreenDidConnectNotification
-                                               object: nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(extScreenDidDisconnect:)
-                                                 name: UIScreenDidDisconnectNotification
-                                               object: nil];
+    Log(LOG_I, @"StreamFrameViewController viewDidAppear");
 
 #if !TARGET_OS_TV
     [[self revealViewController] setPrimaryViewController:self];
@@ -104,7 +85,22 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
+    _mainScene = nil;
+    _externalScene = nil;
+    if (@available(iOS 16.0, *)) {
+        for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.session.role == UIWindowSceneSessionRoleApplication) {
+                _mainScene = scene;
+            }
+            // grab the external display scene when using external display
+            else if (scene.session.role == UIWindowSceneSessionRoleExternalDisplayNonInteractive) {
+                _externalScene = scene;
+            }
+        }
+        Log(LOG_I, @"StreamFrameViewController viewDidLoad, with external scene: %@ on screen %@", _externalScene.description, _externalScene.screen);
+    }
+
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -124,7 +120,7 @@
 #if TARGET_OS_TV
     [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
 #else
-    [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhite];
+    [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleMedium];
 #endif
     [_spinner sizeToFit];
     [_spinner startAnimating];
@@ -133,12 +129,12 @@
     _controllerSupport = [[ControllerSupport alloc] initWithConfig:self.streamConfig delegate:self];
     _inactivityTimer = nil;
 
-    _renderView = (StreamView*)[[UIView alloc] initWithFrame:self.view.frame];
-    _renderView.bounds = _streamView.bounds;
-
     _streamView = [[StreamView alloc] initWithFrame:self.view.frame];
-    [_streamView setupStreamView:_controllerSupport interactionDelegate:self config:self.streamConfig];
-    
+    [_streamView setupStreamView:_controllerSupport
+               withExternalScene:_externalScene
+             interactionDelegate:self
+                          config:self.streamConfig];
+
 #if TARGET_OS_TV
     if (!_menuTapGestureRecognizer || !_menuDoubleTapGestureRecognizer || !_playPauseTapGestureRecognizer) {
         _menuTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(controllerPauseButtonPressed:)];
@@ -179,8 +175,20 @@
     _tipLabel.textColor = [UIColor whiteColor];
     _tipLabel.textAlignment = NSTextAlignmentCenter;
     _tipLabel.center = CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 0.9);
-    
+
+    // when using an external display, create a new window sized to the external display, for use by StreamManager
+    _extWindow = nil;
+    _renderView = _streamView;
+    if (_externalScene != nil) {
+        _extWindow = [[UIWindow alloc] initWithFrame:_externalScene.screen.bounds];
+        _extWindow.windowScene = _externalScene;
+        _renderView = [[UIView alloc] initWithFrame:_externalScene.screen.bounds];
+        [_extWindow addSubview:_renderView];
+        _extWindow.hidden = NO;
+    }
+
     _streamMan = [[StreamManager alloc] initWithConfig:self.streamConfig
+                                     withExternalScene:_externalScene
                                             renderView:_renderView
                                    connectionCallbacks:self];
     NSOperationQueue* opQueue = [[NSOperationQueue alloc] init];
@@ -199,6 +207,16 @@
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(applicationDidEnterBackground:)
                                                  name: UIApplicationDidEnterBackgroundNotification
+                                               object: nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(extScreenDidConnect:)
+                                                 name: UIScreenDidConnectNotification
+                                               object: nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(extScreenDidDisconnect:)
+                                                 name: UIScreenDidDisconnectNotification
                                                object: nil];
 
 #if 0
@@ -342,51 +360,35 @@
     _statsUpdateTimer = nil;
     
     [self.navigationController popToRootViewControllerAnimated:YES];
-    _extWindow = nil;
 }
 
-// External Screen connected
 - (void)extScreenDidConnect:(NSNotification *)notification {
-    Log(LOG_I, @"External Screen Connected");
-    dispatch_async(dispatch_get_main_queue(), ^{
-    [self prepExtScreen:notification.object];
-    });
+    Log(LOG_I, @"extScreenDidConnect");
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self prepExtScreen:notification.object];
+//    });
 }
 
-// External Screen disconnected
 - (void)extScreenDidDisconnect:(NSNotification *)notification {
-    Log(LOG_I, @"External Screen Disconnected");
-    if(UIScreen.screens.count < 2)
-    {
+    Log(LOG_I, @"extScreenDidDisconnect");
+    if (UIScreen.screens.count < 2) {
         dispatch_async(dispatch_get_main_queue(), ^{
-        [self removeExtScreen];
+            [self removeExtScreen];
         });
     }
 }
 
-// Prepare Screen
-- (void)prepExtScreen:(UIScreen*)extScreen {
-    Log(LOG_I, @"Preparing External Screen");
-    CGRect frame = extScreen.bounds;
-    extScreen.overscanCompensation = 3;
-    _extWindow = [[UIWindow alloc] initWithFrame:frame];
-    _extWindow.screen = extScreen;
-    _renderView.bounds = frame;
-    _renderView.frame = frame;
-    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-    [nc postNotificationName:@"ScreenConnected" object:self];
-    [_extWindow addSubview:_renderView];
-    _extWindow.hidden = NO;
-}
-
 - (void)removeExtScreen {
-    Log(LOG_I, @"Removing External Screen");
-    _extWindow.hidden = YES;
-    _renderView.bounds = _deviceWindow.bounds;
-    _renderView.frame = _deviceWindow.frame;
-    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-    [nc postNotificationName:@"ScreenDisconnected" object:self];
-    [self.view insertSubview:_renderView atIndex:0];
+    Log(LOG_I, @"removeExtScreen");
+
+    _extWindow.hidden  = YES;
+    _renderView.bounds = _mainScene.screen.bounds;
+    _renderView.frame  = _mainScene.screen.bounds;
+
+    // XXX these are in ExternalSceneDelegate
+//    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+//    [nc postNotificationName:@"ScreenDisconnected" object:self];
+//    [self.view insertSubview:_renderView atIndex:0];
 }
 
 // This will fire if the user opens control center or gets a low battery message
