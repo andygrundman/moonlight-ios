@@ -541,9 +541,6 @@ static NSMutableSet* hostList;
     }]];
 #if !TARGET_OS_TV
     if (host.state != StateOnline) {
-        [longClickAlert addAction:[UIAlertAction actionWithTitle:@"NVIDIA GameStream End-of-Service" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action){
-            [Utils launchUrl:@"https://github.com/moonlight-stream/moonlight-docs/wiki/NVIDIA-GameStream-End-Of-Service-Announcement-FAQ"];
-        }]];
         [longClickAlert addAction:[UIAlertAction actionWithTitle:@"Connection Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action){
             [Utils launchUrl:@"https://github.com/moonlight-stream/moonlight-docs/wiki/Troubleshooting"];
         }]];
@@ -558,6 +555,27 @@ static NSMutableSet* hostList;
             [self updateAllHosts:[hostList allObjects]];
         }
         
+    }]];
+    [longClickAlert addAction:[UIAlertAction actionWithTitle:@"View Details" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action) {
+        NSString* format = @"Name: %@\n"
+                            "Status: %@\n"
+                            "Active Address: %@\n"
+                            "Local Address: %@\n"
+                            "Remote Address: %@\n"
+                            "IPv6 Address: %@\n"
+                            "Manual Address: %@\n"
+                            "MAC Address: %@\n"
+                            "Pair State: %@\n"
+                            "Running Game ID: %@\n"
+                            "HTTPS Port: %d\n";
+        NSString *status = host.state == StateOnline ? @"Online" : host.state == StateOffline ? @"Offline" : @"Unknown";
+        NSString *pairState = host.pairState == PairStatePaired ? @"Paired" : host.pairState == PairStateUnpaired ? @"Unpaired" : @"Unknown";
+        NSString *message = [NSString stringWithFormat:format, host.name, status, host.activeAddress, host.localAddress, host.externalAddress,
+                             host.ipv6Address, host.address, host.mac, pairState, host.currentGame, host.httpsPort];
+
+        UIAlertController* detailsAlert = [UIAlertController alertControllerWithTitle:@"Details" message:message preferredStyle:UIAlertControllerStyleAlert];
+        [detailsAlert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        [[self activeViewController] presentViewController:detailsAlert animated:YES completion:nil];
     }]];
     [longClickAlert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     
