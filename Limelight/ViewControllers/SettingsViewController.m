@@ -6,6 +6,17 @@
 //  Copyright (c) 2014 Moonlight Stream. All rights reserved.
 //
 
+// TODO for Settings2 -Andy
+// New settings:
+//
+// Audio Configuration (label)
+//   Stereo | 5.1 Surround | 7.1 Surround
+//   Fixed Spatial | Head-tracked Spatial | Classic (SDL)
+//   tooltip: Surround sound audio is rendered as spatial audio when using any pair of stereo headphones or your iPhone/iPad's built-in speakers. A note for AirPods users: Moonlight uses the lowest-latency AudioUnit API for spatial audio, and this disables Control Center's usual spatial audio controls. Instead, you may select Fixed or Head-tracked modes here. If you have any problems with spatial audio, you can switch back to the Classic SDL audio renderer. Note: external stereo speakers and multichannel audio devices receive a mixed-down stream as necessary.
+// Video stream prefers external display
+//   Yes | No
+//   tooltip: When an external display is connected or AirPlay mirroring is in use, Moonlight will attempt to display the stream on this display at the closest matching resolution, refresh rate, and HDR mode. The main iOS device retains any overlays and touch controls. On external displays, you may need to enable HDR and allow resolution changes by visiting Seettings -> Display -> <display name>.
+
 #import "SettingsViewController.h"
 #import "TemporarySettings.h"
 #import "DataManager.h"
@@ -90,7 +101,7 @@ CGSize resolutionTable[RESOLUTION_TABLE_SIZE];
             highestViewY = currentViewY;
         }
     }
-    
+
     // Add a bit of padding so the view doesn't end right at the button of the display
     self.scrollView.contentSize = CGSizeMake(self.scrollView.contentSize.width,
                                              highestViewY + 20);
@@ -152,9 +163,9 @@ BOOL isCustomResolution(CGSize res) {
     UITapGestureRecognizer *resolutionDisplayViewTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resolutionDisplayViewTapped:)];
     [self.resolutionDisplayView addGestureRecognizer:resolutionDisplayViewTap];
     
-    resolutionTable[0] = CGSizeMake(640, 360);
-    resolutionTable[1] = CGSizeMake(1280, 720);
-    resolutionTable[2] = CGSizeMake(1920, 1080);
+    resolutionTable[0] = CGSizeMake(1280, 720);
+    resolutionTable[1] = CGSizeMake(1920, 1080);
+    resolutionTable[2] = CGSizeMake(2560, 1440);
     resolutionTable[3] = CGSizeMake(3840, 2160);
     resolutionTable[4] = CGSizeMake(safeAreaWidth, fullScreenHeight);
     resolutionTable[5] = CGSizeMake(fullScreenWidth, fullScreenHeight);
@@ -174,8 +185,11 @@ BOOL isCustomResolution(CGSize res) {
         case 60:
             framerate = 1;
             break;
-        case 120:
+        case 90:
             framerate = 2;
+            break;
+        case 120:
+            framerate = 3;
             break;
     }
 
@@ -188,17 +202,18 @@ BOOL isCustomResolution(CGSize res) {
         }
     }
 
-    // Only show the 120 FPS option if we have a > 60-ish Hz display
-    bool enable120Fps = false;
+    // Only show the 90 & 120 FPS options if we have a > 60-ish Hz display
+    bool enableHighFramerate = false;
     if (@available(iOS 10.3, tvOS 10.3, *)) {
         for (UIScreen *screen in [UIScreen screens]) {
             if (screen.maximumFramesPerSecond > 62) {
-                enable120Fps = true;
+                enableHighFramerate = true;
             }
         }
     }
-    if (!enable120Fps) {
+    if (!enableHighFramerate) {
         [self.framerateSelector removeSegmentAtIndex:2 animated:NO];
+        [self.framerateSelector removeSegmentAtIndex:3 animated:NO];
     }
 
     // Disable codec selector segments for unsupported codecs
@@ -241,15 +256,38 @@ BOOL isCustomResolution(CGSize res) {
     else {
         [self.hdrSelector setSelectedSegmentIndex:currentSettings.enableHdr ? 1 : 0];
     }
-    
+
+    NSInteger audioConfigIndex;
+    switch ([currentSettings.audioConfig integerValue]) {
+        default:
+        case 2:
+            audioConfigIndex = 0;
+            break;
+        case 6:
+            audioConfigIndex = 1;
+            break;
+        case 8:
+            audioConfigIndex = 2;
+            break;
+    }
+
+    // show when no external display is connected by disabling the setting
+    if (UIScreen.screens.count <= 1) {
+        [self.externalDisplaySelector removeAllSegments];
+        [self.externalDisplaySelector insertSegmentWithTitle:@"Connect a mirrored display" atIndex:0 animated:NO];
+        [self.externalDisplaySelector setEnabled:NO];
+    }
+
     [self.touchModeSelector setSelectedSegmentIndex:currentSettings.absoluteTouchMode ? 1 : 0];
     [self.touchModeSelector addTarget:self action:@selector(touchModeChanged) forControlEvents:UIControlEventValueChanged];
     [self.statsOverlaySelector setSelectedSegmentIndex:currentSettings.statsOverlay ? 1 : 0];
+    [self.externalDisplaySelector setSelectedSegmentIndex:currentSettings.useExternalDisplay ? 1 : 0];
     [self.btMouseSelector setSelectedSegmentIndex:currentSettings.btMouseSupport ? 1 : 0];
     [self.optimizeSettingsSelector setSelectedSegmentIndex:currentSettings.optimizeGames ? 1 : 0];
     [self.framePacingSelector setSelectedSegmentIndex:currentSettings.useFramePacing ? 1 : 0];
     [self.multiControllerSelector setSelectedSegmentIndex:currentSettings.multiController ? 1 : 0];
     [self.swapABXYButtonsSelector setSelectedSegmentIndex:currentSettings.swapABXYButtons ? 1 : 0];
+    [self.audioConfigSelector setSelectedSegmentIndex:audioConfigIndex];
     [self.audioOnPCSelector setSelectedSegmentIndex:currentSettings.playAudioOnPC ? 1 : 0];
     NSInteger onscreenControls = [currentSettings.onscreenControls integerValue];
     _lastSelectedResolutionIndex = resolution;
@@ -328,7 +366,7 @@ BOOL isCustomResolution(CGSize res) {
     }
 
     defaultBitrate = round(resolutionFactor * frameRateFactor) * 1000;
-    _bitrate = MIN(defaultBitrate, 100000);
+    _bitrate = MIN(defaultBitrate, 150000);
     [self.bitrateSlider setValue:[self getSliderValueForBitrate:_bitrate] animated:YES];
     
     [self updateBitrateText];
@@ -476,6 +514,8 @@ BOOL isCustomResolution(CGSize res) {
         case 1:
             return 60;
         case 2:
+            return 90;
+        case 3:
             return 120;
         default:
             abort();
@@ -524,11 +564,25 @@ BOOL isCustomResolution(CGSize res) {
     return resolutionTable[[self.resolutionSelector selectedSegmentIndex]].width;
 }
 
+- (NSInteger) getChosenAudioConfig {
+    switch ([self.audioConfigSelector selectedSegmentIndex]) {
+        case 0:
+            return 2;
+        case 1:
+            return 6;
+        case 2:
+            return 8;
+        default:
+            abort();
+    }
+}
+
 - (void) saveSettings {
     DataManager* dataMan = [[DataManager alloc] init];
     NSInteger framerate = [self getChosenFrameRate];
     NSInteger height = [self getChosenStreamHeight];
     NSInteger width = [self getChosenStreamWidth];
+    NSInteger audioConfig = [self getChosenAudioConfig];
     NSInteger onscreenControls = [self.onscreenControlSelector selectedSegmentIndex];
     BOOL optimizeGames = [self.optimizeSettingsSelector selectedSegmentIndex] == 1;
     BOOL multiController = [self.multiControllerSelector selectedSegmentIndex] == 1;
@@ -539,12 +593,13 @@ BOOL isCustomResolution(CGSize res) {
     BOOL useFramePacing = [self.framePacingSelector selectedSegmentIndex] == 1;
     BOOL absoluteTouchMode = [self.touchModeSelector selectedSegmentIndex] == 1;
     BOOL statsOverlay = [self.statsOverlaySelector selectedSegmentIndex] == 1;
+    BOOL useExternalDisplay = [self.externalDisplaySelector selectedSegmentIndex] == 1;
     BOOL enableHdr = [self.hdrSelector selectedSegmentIndex] == 1;
     [dataMan saveSettingsWithBitrate:_bitrate
                            framerate:framerate
                               height:height
                                width:width
-                         audioConfig:2
+                         audioConfig:audioConfig
                     onscreenControls:onscreenControls
                        optimizeGames:optimizeGames
                      multiController:multiController
@@ -555,7 +610,8 @@ BOOL isCustomResolution(CGSize res) {
                            enableHdr:enableHdr
                       btMouseSupport:btMouseSupport
                    absoluteTouchMode:absoluteTouchMode
-                        statsOverlay:statsOverlay];
+                        statsOverlay:statsOverlay
+                  useExternalDisplay:useExternalDisplay];
 }
 
 - (void)didReceiveMemoryWarning {

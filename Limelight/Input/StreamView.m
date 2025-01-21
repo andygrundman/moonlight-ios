@@ -217,7 +217,6 @@ static const double X1_MOUSE_SPEED_DIVISOR = 2.5;
     
     // This logic mimics what iOS does with AVLayerVideoGravityResizeAspect
     CGSize videoSize = [self getVideoAreaSize];
-    Log(LOG_I, @"videoSize: %fx%f", videoSize.width, videoSize.height); // XXX remove
     CGPoint videoOrigin = CGPointMake(self.bounds.size.width / 2 - videoSize.width / 2,
                                       self.bounds.size.height / 2 - videoSize.height / 2);
     

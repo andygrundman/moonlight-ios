@@ -23,27 +23,10 @@
             ExternalStreamFrameViewController *viewController = [[ExternalStreamFrameViewController alloc] init];
             self.window.rootViewController = viewController;
             self.window.hidden = NO;
-
-            //[self setupDisplayLinkIfNecessary];
         }
         else {
             Log(LOG_E, @"external scene willConnectToSession for invalid role %@", session.role.description);
         }
-    }
-}
-
-// https://developer.apple.com/documentation/uikit/presenting-content-on-a-connected-display?language=objc
-- (void)setupDisplayLinkIfNecessary
-{
-    UIScreen *currentScreen = self.screen;
-    if (currentScreen != self.linkedScreen) {
-        // Set up displaylink
-        CADisplayLink *displayLink = [CADisplayLink displayLinkWithTarget:self
-                                                                selector:@selector(step:)];
-        [displayLink addToRunLoop:[NSRunLoop currentRunLoop]
-                          forMode:NSRunLoopCommonModes];
-
-        self.linkedScreen = currentScreen;
     }
 }
 
@@ -52,8 +35,6 @@
     self.screen = windowScene.screen;
 
     Log(LOG_I, @"didUpdateCoordinateSpace for screen %@", self.screen.description);
-
-    //[self setupDisplayLinkIfNecessary];
 }
 
 - (void)sceneDidDisconnect:(UIScene *)scene
@@ -73,10 +54,6 @@
     //    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
     //    [nc postNotificationName:@"ScreenDisconnected" object:self];
     //    [self.view insertSubview:_renderView atIndex:0];
-}
-
-- (void)step:(CADisplayLink *)sender {
-    Log(LOG_I, @"external displayLink step %f on screen %@", sender.targetTimestamp, self.screen.currentMode);
 }
 
 @end

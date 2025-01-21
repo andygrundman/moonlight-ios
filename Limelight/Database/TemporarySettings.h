@@ -34,6 +34,7 @@
 @property (nonatomic) BOOL btMouseSupport;
 @property (nonatomic) BOOL absoluteTouchMode;
 @property (nonatomic) BOOL statsOverlay;
+@property (nonatomic) BOOL useExternalDisplay;
 
 - (id) initFromSettings:(Settings*)settings;
 

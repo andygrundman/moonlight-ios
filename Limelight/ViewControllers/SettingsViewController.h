@@ -10,6 +10,7 @@
 #import "AppDelegate.h"
 
 @interface SettingsViewController : UIViewController
+@property (strong, nonatomic) IBOutlet UISegmentedControl *audioConfigSelector;
 @property (strong, nonatomic) IBOutlet UILabel *bitrateLabel;
 @property (strong, nonatomic) IBOutlet UISlider *bitrateSlider;
 @property (strong, nonatomic) IBOutlet UISegmentedControl *framerateSelector;
@@ -26,6 +27,7 @@
 @property (strong, nonatomic) IBOutlet UISegmentedControl *framePacingSelector;
 @property (strong, nonatomic) IBOutlet UISegmentedControl *btMouseSelector;
 @property (strong, nonatomic) IBOutlet UISegmentedControl *statsOverlaySelector;
+@property (strong, nonatomic) IBOutlet UISegmentedControl *externalDisplaySelector;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 
 #pragma clang diagnostic push

@@ -67,8 +67,9 @@
                        enableHdr:(BOOL)enableHdr
                   btMouseSupport:(BOOL)btMouseSupport
                absoluteTouchMode:(BOOL)absoluteTouchMode
-                    statsOverlay:(BOOL)statsOverlay {
-    
+                    statsOverlay:(BOOL)statsOverlay
+              useExternalDisplay:(BOOL)useExternalDisplay {
+
     [_managedObjectContext performBlockAndWait:^{
         Settings* settingsToSave = [self retrieveSettings];
         settingsToSave.framerate = [NSNumber numberWithInteger:framerate];
@@ -87,7 +88,8 @@
         settingsToSave.btMouseSupport = btMouseSupport;
         settingsToSave.absoluteTouchMode = absoluteTouchMode;
         settingsToSave.statsOverlay = statsOverlay;
-        
+        settingsToSave.useExternalDisplay = useExternalDisplay;
+
         [self saveData];
     }];
 }

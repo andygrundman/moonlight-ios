@@ -22,10 +22,10 @@ static NSString* DB_NAME = @"Moonlight_tvOS.bin";
 static NSString* DB_NAME = @"Limelight_iOS.sqlite";
 #endif
 
-//- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options
-//{
-//    return [UISceneConfiguration configurationWithName:@"Main" sessionRole:connectingSceneSession.role];
-//}
+- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options
+{
+    return [UISceneConfiguration configurationWithName:@"Main" sessionRole:connectingSceneSession.role];
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #if !TARGET_OS_TV
