@@ -13,9 +13,9 @@
 
 - (id) initFromSettings:(Settings*)settings {
     self = [self init];
-    
+
     self.parent = settings;
-    
+
 #if TARGET_OS_TV
     // Apply default values from our Root.plist
     NSString* settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -29,7 +29,7 @@
         }
     }
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
-    
+
     self.bitrate = [NSNumber numberWithInteger:[[NSUserDefaults standardUserDefaults] integerForKey:@"bitrate"]];
     assert([self.bitrate intValue] != 0);
     self.framerate = [NSNumber numberWithInteger:[[NSUserDefaults standardUserDefaults] integerForKey:@"framerate"]];
@@ -45,7 +45,7 @@
     self.swapABXYButtons = [[NSUserDefaults standardUserDefaults] boolForKey:@"swapABXYButtons"];
     self.btMouseSupport = [[NSUserDefaults standardUserDefaults] boolForKey:@"btMouseSupport"];
     self.statsOverlay = [[NSUserDefaults standardUserDefaults] boolForKey:@"statsOverlay"];
-    
+
     NSInteger _screenSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"streamResolution"];
     switch (_screenSize) {
         case 0:
@@ -74,6 +74,7 @@
     self.height = settings.height;
     self.width = settings.width;
     self.audioConfig = settings.audioConfig;
+    self.spatialAudio = settings.spatialAudio;
     self.preferredCodec = settings.preferredCodec;
     self.useFramePacing = settings.useFramePacing;
     self.playAudioOnPC = settings.playAudioOnPC;
@@ -87,7 +88,7 @@
     self.statsOverlay = settings.statsOverlay;
 #endif
     self.uniqueId = settings.uniqueId;
-    
+
     return self;
 }
 

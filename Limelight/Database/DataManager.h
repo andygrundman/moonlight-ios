@@ -17,7 +17,8 @@
                        framerate:(NSInteger)framerate
                           height:(NSInteger)height
                            width:(NSInteger)width
-                audioConfig:(NSInteger)audioConfig
+                     audioConfig:(NSInteger)audioConfig
+                    spatialAudio:(uint32_t)spatialAudio
                 onscreenControls:(NSInteger)onscreenControls
                    optimizeGames:(BOOL)optimizeGames
                  multiController:(BOOL)multiController

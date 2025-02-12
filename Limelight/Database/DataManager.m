@@ -17,7 +17,7 @@
 
 - (id) init {
     self = [super init];
-    
+
     // HACK: Avoid calling [UIApplication delegate] off the UI thread to keep
     // Main Thread Checker happy.
     if ([NSThread isMainThread]) {
@@ -28,10 +28,10 @@
             self->_appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         });
     }
-    
+
     _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
     [_managedObjectContext setParentContext:[_appDelegate managedObjectContext]];
-    
+
     return self;
 }
 
@@ -44,7 +44,7 @@
 
 - (NSString*) getUniqueId {
     __block NSString *uid;
-    
+
     [_managedObjectContext performBlockAndWait:^{
         uid = [self retrieveSettings].uniqueId;
     }];
@@ -57,6 +57,7 @@
                           height:(NSInteger)height
                            width:(NSInteger)width
                      audioConfig:(NSInteger)audioConfig
+                    spatialAudio:(uint32_t)spatialAudio
                 onscreenControls:(NSInteger)onscreenControls
                    optimizeGames:(BOOL)optimizeGames
                  multiController:(BOOL)multiController
@@ -68,7 +69,7 @@
                   btMouseSupport:(BOOL)btMouseSupport
                absoluteTouchMode:(BOOL)absoluteTouchMode
                     statsOverlay:(BOOL)statsOverlay {
-    
+
     [_managedObjectContext performBlockAndWait:^{
         Settings* settingsToSave = [self retrieveSettings];
         settingsToSave.framerate = [NSNumber numberWithInteger:framerate];
@@ -76,6 +77,7 @@
         settingsToSave.height = [NSNumber numberWithInteger:height];
         settingsToSave.width = [NSNumber numberWithInteger:width];
         settingsToSave.audioConfig = [NSNumber numberWithInteger:audioConfig];
+        settingsToSave.spatialAudio = spatialAudio;
         settingsToSave.onscreenControls = [NSNumber numberWithInteger:onscreenControls];
         settingsToSave.optimizeGames = optimizeGames;
         settingsToSave.multiController = multiController;
@@ -87,7 +89,7 @@
         settingsToSave.btMouseSupport = btMouseSupport;
         settingsToSave.absoluteTouchMode = absoluteTouchMode;
         settingsToSave.statsOverlay = statsOverlay;
-        
+
         [self saveData];
     }];
 }
@@ -100,10 +102,10 @@
             NSEntityDescription* entity = [NSEntityDescription entityForName:@"Host" inManagedObjectContext:self->_managedObjectContext];
             parent = [[Host alloc] initWithEntity:entity insertIntoManagedObjectContext:self->_managedObjectContext];
         }
-        
+
         // Push changes from the temp host to the persistent one
         [host propagateChangesToParent:parent];
-        
+
         [self saveData];
     }];
 }
@@ -115,7 +117,7 @@
             // The host must exist to be updated
             return;
         }
-        
+
         NSMutableSet *applist = [[NSMutableSet alloc] init];
         NSArray *appRecords = [self fetchRecords:@"App"];
         for (TemporaryApp* app in host.appList) {
@@ -125,25 +127,25 @@
                 NSEntityDescription* entity = [NSEntityDescription entityForName:@"App" inManagedObjectContext:self->_managedObjectContext];
                 parentApp = [[App alloc] initWithEntity:entity insertIntoManagedObjectContext:self->_managedObjectContext];
             }
-            
+
             [app propagateChangesToParent:parentApp withHost:parent];
-            
+
             [applist addObject:parentApp];
         }
-        
+
         parent.appList = applist;
-        
+
         [self saveData];
     }];
 }
 
 - (TemporarySettings*) getSettings {
     __block TemporarySettings *tempSettings;
-    
+
     [_managedObjectContext performBlockAndWait:^{
         tempSettings = [[TemporarySettings alloc] initFromSettings:[self retrieveSettings]];
     }];
-    
+
     return tempSettings;
 }
 
@@ -153,7 +155,7 @@
         // create a new settings object with the default values
         NSEntityDescription* entity = [NSEntityDescription entityForName:@"Settings" inManagedObjectContext:_managedObjectContext];
         Settings* settings = [[Settings alloc] initWithEntity:entity insertIntoManagedObjectContext:_managedObjectContext];
-        
+
         return settings;
     } else {
         // we should only ever have 1 settings object stored
@@ -192,15 +194,15 @@
 
 - (NSArray*) getHosts {
     __block NSMutableArray *tempHosts = [[NSMutableArray alloc] init];
-    
+
     [_managedObjectContext performBlockAndWait:^{
         NSArray *hosts = [self fetchRecords:@"Host"];
-        
+
         for (Host* host in hosts) {
             [tempHosts addObject:[[TemporaryHost alloc] initFromHost:host]];
         }
     }];
-    
+
     return tempHosts;
 }
 
@@ -211,7 +213,7 @@
             return host;
         }
     }
-    
+
     return nil;
 }
 
@@ -223,21 +225,21 @@
             return app;
         }
     }
-    
+
     return nil;
 }
 
 - (NSArray*) fetchRecords:(NSString*)entityName {
     NSArray* fetchedRecords;
-    
+
     NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:_managedObjectContext];
     [fetchRequest setEntity:entity];
-    
+
     NSError* error;
     fetchedRecords = [_managedObjectContext executeFetchRequest:fetchRequest error:&error];
     //TODO: handle errors
-    
+
     return fetchedRecords;
 }
 

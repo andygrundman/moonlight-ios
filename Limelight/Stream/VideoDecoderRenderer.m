@@ -8,7 +8,6 @@
 
 #import "VideoDecoderRenderer.h"
 #import "StreamView.h"
-#import "AVSBRenderer.h"
 #import "AVSync.h"
 
 #include <libavcodec/avcodec.h>
@@ -64,10 +63,6 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     // Hide the layer until we get an IDR frame. This ensures we
     // can see the loading progress label as the stream is starting.
     displayLayer.hidden = YES;
-
-    // XXX Not sure if this does anything, due to the way we display frames
-    AVSampleBufferRenderSynchronizer *renderSynchronizer = [AVSBRenderer getRenderSynchronizer];
-    [renderSynchronizer addRenderer:displayLayer];
 
     if (oldLayer != nil) {
         // Switch out the old display layer with the new one

@@ -1,6 +1,7 @@
 #import <Accelerate/Accelerate.h>
 #import "AUSpatialMixer.h"
 #import "AllocatedAudioBufferList.h"
+#import "DataManager.h"
 
 #include "CoreAudioHelpers.h"
 
@@ -258,10 +259,8 @@ bool AUSpatialMixer::setup(AUSpatialMixerOutputType outputType, double inSampleR
             // the audio session category to ambient or run in Game Mode.
             // Head tracking requires the entitlement com.apple.developer.coremotion.head-pose.
 
-            // XXX Head-tracking may cause audio glitches. It's off by default.
-            //StreamingPreferences *prefs = StreamingPreferences::get();
-            //if (prefs->spatialHeadTracking) {
-            if (1) {
+            TemporarySettings* settings = [[[DataManager alloc] init] getSettings];
+            if (settings.spatialAudio == SPATIAL_HEAD_TRACKED) {
                 uint32_t ht = 1;
                 status = AudioUnitSetProperty(getMixer(), kAudioUnitProperty_SpatialMixerEnableHeadTracking, kAudioUnitScope_Global, 0, &ht, sizeof(uint32_t));
                 if (status != noErr) {
@@ -271,6 +270,9 @@ bool AUSpatialMixer::setup(AUSpatialMixerOutputType outputType, double inSampleR
                     DEBUG_TRACE(@"AUSpatialMixer enabled head-tracking");
                     m_HeadTracking = true;
                 }
+            }
+            else {
+                DEBUG_TRACE(@"AUSpatialMixer not enabling head-tracking per user setting");
             }
 
             // For devices that support it, enable personalized head-related transfer function (HRTF).

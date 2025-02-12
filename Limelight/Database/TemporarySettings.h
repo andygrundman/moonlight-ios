@@ -17,6 +17,11 @@
 @property (nonatomic, retain) NSNumber * height;
 @property (nonatomic, retain) NSNumber * width;
 @property (nonatomic, retain) NSNumber * audioConfig;
+@property (nonatomic) enum {
+    SPATIAL_FIXED,
+    SPATIAL_HEAD_TRACKED,
+    SPATIAL_DISABLED,
+} spatialAudio;
 @property (nonatomic, retain) NSNumber * onscreenControls;
 @property (nonatomic, retain) NSString * uniqueId;
 @property (nonatomic) enum {

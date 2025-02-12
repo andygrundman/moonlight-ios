@@ -18,9 +18,9 @@
 #include "Limelight.h"
 #include "opus_multistream.h"
 
-#define AUDIOUNIT_DECODER 0
+#define AUDIOUNIT_DECODER 1
 #define AUDIOQUEUE_DECODER 0
-#define AVSB_DECODER 1
+#define AVSB_DECODER 0
 
 @implementation Connection {
     SERVER_INFORMATION _serverInfo;
@@ -385,7 +385,7 @@ void AudioQueueArDecodeAndPlaySample(char* sampleData, int sampleLength) {
 
 #if AVSB_DECODER
 /// AVSampleBufferAudioRenderer implementation
-/// The easiest way to play spatial audio, but may struggle to meet our low latency requirements
+/// The "correct" way to play spatial audio, but latency is very bad
 
 int AVSBArInit(int audioConfiguration, POPUS_MULTISTREAM_CONFIGURATION inOpusConfig, void* context, int flags) {
     int err;
@@ -667,26 +667,12 @@ void ClSetControllerLED(uint16_t controllerNumber, uint8_t r, uint8_t g, uint8_t
 
     LiInitializeAudioCallbacks(&_arCallbacks);
 
-#if AUDIOUNIT_DECODER
     _arCallbacks.init = ArInit;
     _arCallbacks.start = ArStart;
     _arCallbacks.stop = ArStop;
     _arCallbacks.cleanup = ArCleanup;
     _arCallbacks.decodeAndPlaySample = ArDecodeAndPlaySample;
     _arCallbacks.capabilities = CAPABILITY_SUPPORTS_ARBITRARY_AUDIO_DURATION;
-#elif AUDIOQUEUE_DECODER
-    _arCallbacks.init = AudioQueueArInit;
-    _arCallbacks.cleanup = AudioQueueArCleanup;
-    _arCallbacks.decodeAndPlaySample = AudioQueueArDecodeAndPlaySample;
-    _arCallbacks.capabilities = CAPABILITY_DIRECT_SUBMIT | CAPABILITY_SUPPORTS_ARBITRARY_AUDIO_DURATION;
-#elif AVSB_DECODER
-    _arCallbacks.init = AVSBArInit;
-    _arCallbacks.start = AVSBArStart;
-    _arCallbacks.stop = AVSBArStop;
-    _arCallbacks.cleanup = AVSBArCleanup;
-    _arCallbacks.decodeWithTimestamp = AVSBArDecodeWithTimestamp;
-    _arCallbacks.capabilities = CAPABILITY_SUPPORTS_ARBITRARY_AUDIO_DURATION | CAPABILITY_USES_RTP_TIMESTAMP;
-#endif
 
     LiInitializeConnectionCallbacks(&_clCallbacks);
     _clCallbacks.stageStarting = ClStageStarting;
