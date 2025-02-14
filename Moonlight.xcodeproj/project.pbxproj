@@ -41,8 +41,6 @@
 		98CFB82F1CAD481B0048EF74 /* libmoonlight-common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98AB2E841CAD46840089BB98 /* libmoonlight-common.a */; };
 		98D5856D1C0EA79600F6CC00 /* TemporaryHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */; };
 		98D585701C0ED0E800F6CC00 /* TemporarySettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */; };
-		A103915A2D211EC8008362F3 /* AVSBRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A10391592D211EC7008362F3 /* AVSBRenderer.mm */; };
-		A103915B2D211EC9008362F3 /* AVSBRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A10391592D211EC7008362F3 /* AVSBRenderer.mm */; };
 		A117B9CD2D290C3600E4ADE8 /* AVSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = A117B9CC2D290C2B00E4ADE8 /* AVSync.mm */; };
 		A117B9CE2D290C3600E4ADE8 /* AVSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = A117B9CC2D290C2B00E4ADE8 /* AVSync.mm */; };
 		A15AFBDA2D1615B200848F45 /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A15AFBD82D1615B200848F45 /* TPCircularBuffer.c */; };
@@ -61,8 +59,6 @@
 		A15AFBEF2D1616AD00848F45 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */; };
 		A15AFBF12D1616B000848F45 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBF02D1616B000848F45 /* AVFAudio.framework */; };
 		A15AFBF32D1616B400848F45 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15AFBF22D1616B400848F45 /* CoreAudio.framework */; };
-		A1D2C4192D1DE4100093BA7D /* AQRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C4182D1DE40A0093BA7D /* AQRenderer.mm */; };
-		A1D2C41A2D1DE4100093BA7D /* AQRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C4182D1DE40A0093BA7D /* AQRenderer.mm */; };
 		A1D2C4222D1E8F820093BA7D /* AudioStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */; };
 		A1D2C4232D1E8F820093BA7D /* AudioStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */; };
 		DC1F5A07206436B20037755F /* ConnectionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1F5A06206436B20037755F /* ConnectionHelper.m */; };
@@ -236,8 +232,6 @@
 		98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporaryHost.m; path = Database/TemporaryHost.m; sourceTree = "<group>"; };
 		98D5856E1C0ED0E800F6CC00 /* TemporarySettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TemporarySettings.h; path = Database/TemporarySettings.h; sourceTree = "<group>"; };
 		98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporarySettings.m; path = Database/TemporarySettings.m; sourceTree = "<group>"; };
-		A10391582D211EC0008362F3 /* AVSBRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVSBRenderer.h; sourceTree = "<group>"; };
-		A10391592D211EC7008362F3 /* AVSBRenderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AVSBRenderer.mm; sourceTree = "<group>"; };
 		A117B9CB2D29026A00E4ADE8 /* AVSync.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVSync.h; sourceTree = "<group>"; };
 		A117B9CC2D290C2B00E4ADE8 /* AVSync.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AVSync.mm; sourceTree = "<group>"; };
 		A15AFBCF2D1615B200848F45 /* AllocatedAudioBufferList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AllocatedAudioBufferList.h; sourceTree = "<group>"; };
@@ -260,8 +254,6 @@
 		A15AFBEE2D1616AD00848F45 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		A15AFBF02D1616B000848F45 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/AVFAudio.framework; sourceTree = DEVELOPER_DIR; };
 		A15AFBF22D1616B400848F45 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.2.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
-		A1D2C4172D1DE3DA0093BA7D /* AQRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AQRenderer.h; sourceTree = "<group>"; };
-		A1D2C4182D1DE40A0093BA7D /* AQRenderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AQRenderer.mm; sourceTree = "<group>"; };
 		A1D2C4202D1E8F750093BA7D /* AudioStats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioStats.h; sourceTree = "<group>"; };
 		A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AudioStats.cpp; sourceTree = "<group>"; };
 		D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Moonlight-Bridging-Header.h"; path = "Input/Moonlight-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -447,12 +439,8 @@
 			children = (
 				A117B9CC2D290C2B00E4ADE8 /* AVSync.mm */,
 				A117B9CB2D29026A00E4ADE8 /* AVSync.h */,
-				A10391592D211EC7008362F3 /* AVSBRenderer.mm */,
-				A10391582D211EC0008362F3 /* AVSBRenderer.h */,
 				A1D2C4212D1E8F7B0093BA7D /* AudioStats.cpp */,
 				A1D2C4202D1E8F750093BA7D /* AudioStats.h */,
-				A1D2C4172D1DE3DA0093BA7D /* AQRenderer.h */,
-				A1D2C4182D1DE40A0093BA7D /* AQRenderer.mm */,
 				A15AFBCF2D1615B200848F45 /* AllocatedAudioBufferList.h */,
 				A15AFBD02D1615B200848F45 /* AUSpatialMixer.h */,
 				A15AFBD12D1615B200848F45 /* AUSpatialMixer.mm */,
@@ -940,7 +928,6 @@
 				9865DC38213287FE0005B9B9 /* LoadingFrameViewController.m in Sources */,
 				9865DC31213260F10005B9B9 /* mkcert.c in Sources */,
 				FB1A67E32132498A00507771 /* Limelight.xcdatamodeld in Sources */,
-				A103915A2D211EC8008362F3 /* AVSBRenderer.mm in Sources */,
 				FB1A67DE2132460A00507771 /* Utils.m in Sources */,
 				FB1A67E02132460A00507771 /* Logger.m in Sources */,
 				FB1A67D52132460400507771 /* ControllerSupport.m in Sources */,
@@ -970,7 +957,6 @@
 				9819CC1D254F1730008A7C8E /* RelativeTouchHandler.m in Sources */,
 				FB1A67AB213245C500507771 /* CryptoManager.m in Sources */,
 				FB1A67AF213245C500507771 /* IdManager.m in Sources */,
-				A1D2C4192D1DE4100093BA7D /* AQRenderer.mm in Sources */,
 				988FCD42293B091B003050E2 /* KeyboardInputField.m in Sources */,
 				A15AFBDA2D1615B200848F45 /* TPCircularBuffer.c in Sources */,
 				A15AFBDB2D1615B200848F45 /* OutputAU.mm in Sources */,
@@ -1024,7 +1010,6 @@
 				FBD1C8E21A8AD71400C6703C /* Logger.m in Sources */,
 				FB1D599A1BBCCD7E00F482CA /* AppCollectionView.m in Sources */,
 				FB89463619F646E200339C8A /* StreamFrameViewController.m in Sources */,
-				A1D2C41A2D1DE4100093BA7D /* AQRenderer.mm in Sources */,
 				9827E7A32514366900F25707 /* HapticContext.m in Sources */,
 				9832D1361BBCD5C50036EF48 /* TemporaryApp.m in Sources */,
 				98D585701C0ED0E800F6CC00 /* TemporarySettings.m in Sources */,
@@ -1039,7 +1024,6 @@
 				FB6549561A57907E001C8F39 /* DiscoveryWorker.m in Sources */,
 				FB89462A19F646E200339C8A /* ControllerSupport.m in Sources */,
 				FB9AFD3D1A7E111600872C98 /* AppAssetResponse.m in Sources */,
-				A103915B2D211EC9008362F3 /* AVSBRenderer.mm in Sources */,
 				FBD349621A0089F6002D2A60 /* DataManager.m in Sources */,
 				FB4A23B81A9D3637004D2EF2 /* LoadingFrameViewController.m in Sources */,
 				FB9AFD3A1A7E05CE00872C98 /* ServerInfoResponse.m in Sources */,
