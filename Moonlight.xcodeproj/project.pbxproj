@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,6 +43,41 @@
 		98CFB82F1CAD481B0048EF74 /* libmoonlight-common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98AB2E841CAD46840089BB98 /* libmoonlight-common.a */; };
 		98D5856D1C0EA79600F6CC00 /* TemporaryHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */; };
 		98D585701C0ED0E800F6CC00 /* TemporarySettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */; };
+		A10BC62C2DE8E65800905783 /* BandwidthTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = A10BC62B2DE8E65800905783 /* BandwidthTracker.m */; };
+		A10BC62D2DE8E65800905783 /* BandwidthTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = A10BC62B2DE8E65800905783 /* BandwidthTracker.m */; };
+		A12025BF2DD7E370005015C8 /* ImGuiRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A12025BE2DD7E36B005015C8 /* ImGuiRenderer.mm */; };
+		A12025C02DD7E370005015C8 /* ImGuiRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A12025BE2DD7E36B005015C8 /* ImGuiRenderer.mm */; };
+		A12476D22E14959E008D54F5 /* MetalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A12476D12E14959C008D54F5 /* MetalViewController.m */; };
+		A12476D32E14959E008D54F5 /* MetalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A12476D12E14959C008D54F5 /* MetalViewController.m */; };
+		A12476D62E1495AA008D54F5 /* MetalView.m in Sources */ = {isa = PBXBuildFile; fileRef = A12476D52E1495AA008D54F5 /* MetalView.m */; };
+		A12476D72E1495AA008D54F5 /* MetalView.m in Sources */ = {isa = PBXBuildFile; fileRef = A12476D52E1495AA008D54F5 /* MetalView.m */; };
+		A12476DE2E14D0B5008D54F5 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = A12476DD2E14D0B2008D54F5 /* Shaders.metal */; };
+		A12476DF2E14D0B5008D54F5 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = A12476DD2E14D0B2008D54F5 /* Shaders.metal */; };
+		A12476E32E161986008D54F5 /* ImGuiPlots.mm in Sources */ = {isa = PBXBuildFile; fileRef = A12476E22E161982008D54F5 /* ImGuiPlots.mm */; };
+		A12476E42E161986008D54F5 /* ImGuiPlots.mm in Sources */ = {isa = PBXBuildFile; fileRef = A12476E22E161982008D54F5 /* ImGuiPlots.mm */; };
+		A156D0492E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */ = {isa = PBXBuildFile; fileRef = A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */; };
+		A156D04A2E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */ = {isa = PBXBuildFile; fileRef = A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */; };
+		A19562AC2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */; };
+		A19562AD2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */; };
+		A1967D9A2DEE419F00EFC5CF /* FloatBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1967D992DEE419B00EFC5CF /* FloatBuffer.m */; };
+		A1967D9B2DEE419F00EFC5CF /* FloatBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1967D992DEE419B00EFC5CF /* FloatBuffer.m */; };
+		A1A777DC2DDBEC5500E071D8 /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777DB2DDBEC5500E071D8 /* imgui_widgets.cpp */; };
+		A1A777DD2DDBEC5500E071D8 /* imgui_demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777D52DDBEC5500E071D8 /* imgui_demo.cpp */; };
+		A1A777DF2DDBEC5500E071D8 /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777D42DDBEC5500E071D8 /* imgui.cpp */; };
+		A1A777E02DDBEC5500E071D8 /* imgui_draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777D62DDBEC5500E071D8 /* imgui_draw.cpp */; };
+		A1A777E12DDBEC5500E071D8 /* imgui_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777DA2DDBEC5500E071D8 /* imgui_tables.cpp */; };
+		A1A777E22DDBEC5500E071D8 /* imgui_widgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777DB2DDBEC5500E071D8 /* imgui_widgets.cpp */; };
+		A1A777E32DDBEC5500E071D8 /* imgui_demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777D52DDBEC5500E071D8 /* imgui_demo.cpp */; };
+		A1A777E52DDBEC5500E071D8 /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777D42DDBEC5500E071D8 /* imgui.cpp */; };
+		A1A777E62DDBEC5500E071D8 /* imgui_draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777D62DDBEC5500E071D8 /* imgui_draw.cpp */; };
+		A1A777E72DDBEC5500E071D8 /* imgui_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1A777DA2DDBEC5500E071D8 /* imgui_tables.cpp */; };
+		A1C760BE2E10FAB600110E0E /* MetalVideoRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1C760BD2E10FAB300110E0E /* MetalVideoRenderer.m */; };
+		A1C760BF2E10FAB600110E0E /* MetalVideoRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1C760BD2E10FAB300110E0E /* MetalVideoRenderer.m */; };
+		A1D0DEAD2E06018400086726 /* Frame.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D0DEAC2E06018200086726 /* Frame.m */; };
+		A1D0DEAE2E06018400086726 /* Frame.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D0DEAC2E06018200086726 /* Frame.m */; };
+		A1D406AE2E0A77AC00DC0A77 /* FrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */; };
+		A1D406AF2E0A77AC00DC0A77 /* FrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */; };
+		A1D406B02E0A77AC00DC0A77 /* FrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */; };
 		DC1F5A07206436B20037755F /* ConnectionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1F5A06206436B20037755F /* ConnectionHelper.m */; };
 		F74BEF9C2C1A705600224667 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F74BEF9B2C1A705600224667 /* OpenSSL */; };
 		F74BEFA42C1A80E400224667 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F74BEFA32C1A80E400224667 /* OpenSSL */; };
@@ -155,6 +190,13 @@
 			remoteGlobalIDString = FB290E2D19B37A4E004C83CF;
 			remoteInfo = "moonlight-common";
 		};
+		A13F90E62DFD2DE10010BB0F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB290CE619B2C406004C83CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB290CED19B2C406004C83CF;
+			remoteInfo = Moonlight;
+		};
 		FB1A68142132509400507771 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 98AB2E7F1CAD46830089BB98 /* moonlight-common.xcodeproj */;
@@ -216,6 +258,45 @@
 		98D5856C1C0EA79600F6CC00 /* TemporaryHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporaryHost.m; path = Database/TemporaryHost.m; sourceTree = "<group>"; };
 		98D5856E1C0ED0E800F6CC00 /* TemporarySettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TemporarySettings.h; path = Database/TemporarySettings.h; sourceTree = "<group>"; };
 		98D5856F1C0ED0E800F6CC00 /* TemporarySettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TemporarySettings.m; path = Database/TemporarySettings.m; sourceTree = "<group>"; };
+		A10BC62A2DE8E42C00905783 /* FloatBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FloatBuffer.h; sourceTree = "<group>"; };
+		A10BC62B2DE8E65800905783 /* BandwidthTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BandwidthTracker.m; sourceTree = "<group>"; };
+		A10BC62E2DE8E65F00905783 /* BandwidthTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BandwidthTracker.h; sourceTree = "<group>"; };
+		A12025BD2DD7E352005015C8 /* ImGuiRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImGuiRenderer.h; sourceTree = "<group>"; };
+		A12025BE2DD7E36B005015C8 /* ImGuiRenderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ImGuiRenderer.mm; sourceTree = "<group>"; };
+		A12476D02E149593008D54F5 /* MetalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalViewController.h; sourceTree = "<group>"; };
+		A12476D12E14959C008D54F5 /* MetalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalViewController.m; sourceTree = "<group>"; };
+		A12476D42E1495A3008D54F5 /* MetalView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalView.h; sourceTree = "<group>"; };
+		A12476D52E1495AA008D54F5 /* MetalView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalView.m; sourceTree = "<group>"; };
+		A12476D82E1495FE008D54F5 /* MetalConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalConfig.h; sourceTree = "<group>"; };
+		A12476DD2E14D0B2008D54F5 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		A12476E12E1618E2008D54F5 /* ImGuiPlots.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImGuiPlots.h; sourceTree = "<group>"; };
+		A12476E22E161982008D54F5 /* ImGuiPlots.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ImGuiPlots.mm; sourceTree = "<group>"; };
+		A13F90582DFC3C5C0010BB0F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		A13F905C2DFC3C710010BB0F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/AppleTVOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		A13F90E22DFD2DE10010BB0F /* MoonlightTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoonlightTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = "Shaders-Linear.metal"; sourceTree = "<group>"; };
+		A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = imgui_impl_metal.mm; sourceTree = "<group>"; };
+		A1967D992DEE419B00EFC5CF /* FloatBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FloatBuffer.m; sourceTree = "<group>"; };
+		A1967DB32DF036B800EFC5CF /* Plot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Plot.h; sourceTree = "<group>"; };
+		A1A777D22DDBEC5500E071D8 /* imconfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imconfig.h; path = ../third_party/imgui/imconfig.h; sourceTree = "<group>"; };
+		A1A777D32DDBEC5500E071D8 /* imgui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui.h; path = ../third_party/imgui/imgui.h; sourceTree = "<group>"; };
+		A1A777D42DDBEC5500E071D8 /* imgui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = imgui.cpp; path = ../third_party/imgui/imgui.cpp; sourceTree = "<group>"; };
+		A1A777D52DDBEC5500E071D8 /* imgui_demo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_demo.cpp; path = ../third_party/imgui/imgui_demo.cpp; sourceTree = "<group>"; };
+		A1A777D62DDBEC5500E071D8 /* imgui_draw.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_draw.cpp; path = ../third_party/imgui/imgui_draw.cpp; sourceTree = "<group>"; };
+		A1A777D72DDBEC5500E071D8 /* imgui_impl_metal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_impl_metal.h; path = ../third_party/imgui/backends/imgui_impl_metal.h; sourceTree = "<group>"; };
+		A1A777D92DDBEC5500E071D8 /* imgui_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = imgui_internal.h; path = ../third_party/imgui/imgui_internal.h; sourceTree = "<group>"; };
+		A1A777DA2DDBEC5500E071D8 /* imgui_tables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_tables.cpp; path = ../third_party/imgui/imgui_tables.cpp; sourceTree = "<group>"; };
+		A1A777DB2DDBEC5500E071D8 /* imgui_widgets.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = imgui_widgets.cpp; path = ../third_party/imgui/imgui_widgets.cpp; sourceTree = "<group>"; };
+		A1C760BC2E10FA9900110E0E /* MetalVideoRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalVideoRenderer.h; sourceTree = "<group>"; };
+		A1C760BD2E10FAB300110E0E /* MetalVideoRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalVideoRenderer.m; sourceTree = "<group>"; };
+		A1D0DEAB2E06013600086726 /* Frame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Frame.h; sourceTree = "<group>"; };
+		A1D0DEAC2E06018200086726 /* Frame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Frame.m; sourceTree = "<group>"; };
+		A1D406AC2E0A77AC00DC0A77 /* FrameQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrameQueue.h; sourceTree = "<group>"; };
+		A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FrameQueue.m; sourceTree = "<group>"; };
+		A1EBD2F52DD94CE800F3BF4B /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		A1EBD2F62DD94CE900F3BF4B /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		A1EBD2F92DD94CFC00F3BF4B /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.5.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
+		A1EBD2FA2DD94CFC00F3BF4B /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS18.5.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Moonlight-Bridging-Header.h"; path = "Input/Moonlight-Bridging-Header.h"; sourceTree = "<group>"; };
 		DC1F5A05206436B10037755F /* ConnectionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionHelper.h; sourceTree = "<group>"; };
 		DC1F5A06206436B20037755F /* ConnectionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionHelper.m; sourceTree = "<group>"; };
@@ -326,7 +407,18 @@
 		FBDE86E519F82297001C18A8 /* UIAppView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIAppView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A13F90E32DFD2DE10010BB0F /* MoonlightTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MoonlightTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		A13F90DF2DFD2DE10010BB0F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FB1A67502132419700507771 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -386,6 +478,48 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A12476CF2E149562008D54F5 /* Metal */ = {
+			isa = PBXGroup;
+			children = (
+				A12476DD2E14D0B2008D54F5 /* Shaders.metal */,
+				A156D0482E2C72DD002E7CA1 /* Shaders-Linear.metal */,
+				A12476D82E1495FE008D54F5 /* MetalConfig.h */,
+				A12476D52E1495AA008D54F5 /* MetalView.m */,
+				A12476D42E1495A3008D54F5 /* MetalView.h */,
+				A12476D12E14959C008D54F5 /* MetalViewController.m */,
+				A12476D02E149593008D54F5 /* MetalViewController.h */,
+				A1C760BD2E10FAB300110E0E /* MetalVideoRenderer.m */,
+				A1C760BC2E10FA9900110E0E /* MetalVideoRenderer.h */,
+			);
+			path = Metal;
+			sourceTree = "<group>";
+		};
+		A12476E02E1618DE008D54F5 /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				A12476E22E161982008D54F5 /* ImGuiPlots.mm */,
+				A12476E12E1618E2008D54F5 /* ImGuiPlots.h */,
+			);
+			path = Stats;
+			sourceTree = "<group>";
+		};
+		A1A777E82DDBECE600E071D8 /* ImGui */ = {
+			isa = PBXGroup;
+			children = (
+				A1A777D22DDBEC5500E071D8 /* imconfig.h */,
+				A1A777D32DDBEC5500E071D8 /* imgui.h */,
+				A1A777D42DDBEC5500E071D8 /* imgui.cpp */,
+				A1A777D52DDBEC5500E071D8 /* imgui_demo.cpp */,
+				A1A777D62DDBEC5500E071D8 /* imgui_draw.cpp */,
+				A1A777D72DDBEC5500E071D8 /* imgui_impl_metal.h */,
+				A19562AB2DE6EDDC005FD7D8 /* imgui_impl_metal.mm */,
+				A1A777D92DDBEC5500E071D8 /* imgui_internal.h */,
+				A1A777DA2DDBEC5500E071D8 /* imgui_tables.cpp */,
+				A1A777DB2DDBEC5500E071D8 /* imgui_widgets.cpp */,
+			);
+			path = ImGui;
+			sourceTree = "<group>";
+		};
 		FB1A67542132419700507771 /* Moonlight TV */ = {
 			isa = PBXGroup;
 			children = (
@@ -401,10 +535,12 @@
 		FB290CE519B2C406004C83CF = {
 			isa = PBXGroup;
 			children = (
+				A1A777E82DDBECE600E071D8 /* ImGui */,
 				9896219423D15C2900211983 /* X1Kit */,
 				98AB2E7F1CAD46830089BB98 /* moonlight-common.xcodeproj */,
 				FB290CF919B2C406004C83CF /* Moonlight */,
 				FB1A67542132419700507771 /* Moonlight TV */,
+				A13F90E32DFD2DE10010BB0F /* MoonlightTests */,
 				FB290CF019B2C406004C83CF /* Frameworks */,
 				FB290CEF19B2C406004C83CF /* Products */,
 			);
@@ -415,6 +551,7 @@
 			children = (
 				FB290CEE19B2C406004C83CF /* Moonlight.app */,
 				FB1A67532132419700507771 /* Moonlight TV.app */,
+				A13F90E22DFD2DE10010BB0F /* MoonlightTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -422,6 +559,12 @@
 		FB290CF019B2C406004C83CF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A13F90582DFC3C5C0010BB0F /* XCTest.framework */,
+				A13F905C2DFC3C710010BB0F /* XCTest.framework */,
+				A1EBD2F52DD94CE800F3BF4B /* Metal.framework */,
+				A1EBD2FA2DD94CFC00F3BF4B /* Metal.framework */,
+				A1EBD2F62DD94CE900F3BF4B /* MetalKit.framework */,
+				A1EBD2F92DD94CFC00F3BF4B /* MetalKit.framework */,
 				98882A032AF60F5300C5A11C /* libavcodec.a */,
 				98882A052AF60F5300C5A11C /* libavformat.a */,
 				98882A0A2AF60F9000C5A11C /* libavcodec.a */,
@@ -449,9 +592,13 @@
 		FB290CF919B2C406004C83CF /* Moonlight */ = {
 			isa = PBXGroup;
 			children = (
+				A12476E02E1618DE008D54F5 /* Stats */,
+				A12025BE2DD7E36B005015C8 /* ImGuiRenderer.mm */,
+				A12025BD2DD7E352005015C8 /* ImGuiRenderer.h */,
 				D4746EEA1CBC740C006FB401 /* Moonlight-Bridging-Header.h */,
 				FB89460419F646E200339C8A /* Crypto */,
 				FB89460919F646E200339C8A /* Input */,
+				A12476CF2E149562008D54F5 /* Metal */,
 				FB89460E19F646E200339C8A /* Network */,
 				FB89461519F646E200339C8A /* Stream */,
 				FB89461E19F646E200339C8A /* Utility */,
@@ -550,8 +697,8 @@
 				FB89461719F646E200339C8A /* Connection.m */,
 				FB89461819F646E200339C8A /* StreamConfiguration.h */,
 				FB89461919F646E200339C8A /* StreamConfiguration.m */,
-				FB89461A19F646E200339C8A /* StreamManager.h */,
 				FB89461B19F646E200339C8A /* StreamManager.m */,
+				FB89461A19F646E200339C8A /* StreamManager.h */,
 				FB89461C19F646E200339C8A /* VideoDecoderRenderer.h */,
 				FB89461D19F646E200339C8A /* VideoDecoderRenderer.m */,
 				9803CCAB254F9EAF00EE185E /* ConnectionCallbacks.h */,
@@ -562,6 +709,15 @@
 		FB89461E19F646E200339C8A /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				A1D406AC2E0A77AC00DC0A77 /* FrameQueue.h */,
+				A1D406AD2E0A77AC00DC0A77 /* FrameQueue.m */,
+				A1D0DEAC2E06018200086726 /* Frame.m */,
+				A1D0DEAB2E06013600086726 /* Frame.h */,
+				A1967DB32DF036B800EFC5CF /* Plot.h */,
+				A10BC62E2DE8E65F00905783 /* BandwidthTracker.h */,
+				A10BC62B2DE8E65800905783 /* BandwidthTracker.m */,
+				A10BC62A2DE8E42C00905783 /* FloatBuffer.h */,
+				A1967D992DEE419B00EFC5CF /* FloatBuffer.m */,
 				FB89462119F646E200339C8A /* Utils.h */,
 				FB89462219F646E200339C8A /* Utils.m */,
 				FBD1C8E01A8AD69E00C6703C /* Logger.h */,
@@ -694,6 +850,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A13F90E12DFD2DE10010BB0F /* MoonlightTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A13F90E82DFD2DE10010BB0F /* Build configuration list for PBXNativeTarget "MoonlightTests" */;
+			buildPhases = (
+				A13F90DE2DFD2DE10010BB0F /* Sources */,
+				A13F90DF2DFD2DE10010BB0F /* Frameworks */,
+				A13F90E02DFD2DE10010BB0F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A13F90E72DFD2DE10010BB0F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A13F90E32DFD2DE10010BB0F /* MoonlightTests */,
+			);
+			name = MoonlightTests;
+			packageProductDependencies = (
+			);
+			productName = MoonlightTests;
+			productReference = A13F90E22DFD2DE10010BB0F /* MoonlightTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		FB1A67522132419700507771 /* Moonlight TV */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB1A67682132419A00507771 /* Build configuration list for PBXNativeTarget "Moonlight TV" */;
@@ -742,10 +921,17 @@
 		FB290CE619B2C406004C83CF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					New,
+				);
 				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = "Moonlight Game Streaming Project";
 				TargetAttributes = {
+					A13F90E12DFD2DE10010BB0F = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = FB290CED19B2C406004C83CF;
+					};
 					FB1A67522132419700507771 = {
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 1140;
@@ -785,6 +971,7 @@
 			targets = (
 				FB290CED19B2C406004C83CF /* Moonlight */,
 				FB1A67522132419700507771 /* Moonlight TV */,
+				A13F90E12DFD2DE10010BB0F /* MoonlightTests */,
 			);
 		};
 /* End PBXProject section */
@@ -807,6 +994,13 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A13F90E02DFD2DE10010BB0F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FB1A67512132419700507771 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -833,6 +1027,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A13F90DE2DFD2DE10010BB0F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1D406AE2E0A77AC00DC0A77 /* FrameQueue.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FB1A674F2132419700507771 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -843,16 +1045,25 @@
 				9865DC36213287F30005B9B9 /* AppDelegate.m in Sources */,
 				FB1A6819213284FB00507771 /* UIComputerView.m in Sources */,
 				FB1A681A213284FB00507771 /* UIAppView.m in Sources */,
+				A1A777E22DDBEC5500E071D8 /* imgui_widgets.cpp in Sources */,
+				A1A777E32DDBEC5500E071D8 /* imgui_demo.cpp in Sources */,
+				A1A777E52DDBEC5500E071D8 /* imgui.cpp in Sources */,
+				A1A777E62DDBEC5500E071D8 /* imgui_draw.cpp in Sources */,
+				A1A777E72DDBEC5500E071D8 /* imgui_tables.cpp in Sources */,
+				A1D0DEAD2E06018400086726 /* Frame.m in Sources */,
 				FB1A681B213284FB00507771 /* ComputerScrollView.m in Sources */,
 				FB1A681C213284FB00507771 /* AppCollectionView.m in Sources */,
+				A1C760BF2E10FAB600110E0E /* MetalVideoRenderer.m in Sources */,
 				9865DC37213287FE0005B9B9 /* StreamFrameViewController.m in Sources */,
 				9865DC38213287FE0005B9B9 /* LoadingFrameViewController.m in Sources */,
 				9865DC31213260F10005B9B9 /* mkcert.c in Sources */,
+				A12476D22E14959E008D54F5 /* MetalViewController.m in Sources */,
 				FB1A67E32132498A00507771 /* Limelight.xcdatamodeld in Sources */,
 				FB1A67DE2132460A00507771 /* Utils.m in Sources */,
 				FB1A67E02132460A00507771 /* Logger.m in Sources */,
 				FB1A67D52132460400507771 /* ControllerSupport.m in Sources */,
 				FB1A67D82132460400507771 /* StreamView.m in Sources */,
+				A12025BF2DD7E370005015C8 /* ImGuiRenderer.mm in Sources */,
 				9896219A23D56E8100211983 /* X1Kit.swift in Sources */,
 				FB1A67DA2132460400507771 /* OnScreenControls.m in Sources */,
 				FB1A67DC2132460400507771 /* KeyboardSupport.m in Sources */,
@@ -862,12 +1073,19 @@
 				FB1A67D3213245F800507771 /* TemporarySettings.m in Sources */,
 				4A37FDA52DCAD28F00441192 /* PaddedLabel.m in Sources */,
 				FB1A67C3213245EA00507771 /* AppAssetManager.m in Sources */,
+				A19562AC2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */,
+				A1D406B02E0A77AC00DC0A77 /* FrameQueue.m in Sources */,
+				A1967D9A2DEE419F00EFC5CF /* FloatBuffer.m in Sources */,
 				FB1A67C5213245EA00507771 /* AppAssetRetriever.m in Sources */,
 				FB1A67C7213245EA00507771 /* PairManager.m in Sources */,
+				A156D0492E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */,
 				FB1A67C9213245EA00507771 /* WakeOnLanManager.m in Sources */,
 				FB1A67CB213245EA00507771 /* ConnectionHelper.m in Sources */,
+				A12476E32E161986008D54F5 /* ImGuiPlots.mm in Sources */,
 				FB1A67BD213245E000507771 /* DiscoveryManager.m in Sources */,
+				A12476D62E1495AA008D54F5 /* MetalView.m in Sources */,
 				FB1A67BF213245E000507771 /* DiscoveryWorker.m in Sources */,
+				A12476DF2E14D0B5008D54F5 /* Shaders.metal in Sources */,
 				FB1A67C1213245E000507771 /* MDNSManager.m in Sources */,
 				FB1A67B1213245D500507771 /* HttpManager.m in Sources */,
 				FB1A67B3213245D500507771 /* HttpRequest.m in Sources */,
@@ -880,6 +1098,7 @@
 				FB1A67AF213245C500507771 /* IdManager.m in Sources */,
 				988FCD42293B091B003050E2 /* KeyboardInputField.m in Sources */,
 				FB1A67A3213245BD00507771 /* Connection.m in Sources */,
+				A10BC62C2DE8E65800905783 /* BandwidthTracker.m in Sources */,
 				FB1A67A5213245BD00507771 /* StreamConfiguration.m in Sources */,
 				FB1A67A7213245BD00507771 /* StreamManager.m in Sources */,
 				FB1A67A9213245BD00507771 /* VideoDecoderRenderer.m in Sources */,
@@ -894,13 +1113,17 @@
 				FB290D0719B2C406004C83CF /* Limelight.xcdatamodeld in Sources */,
 				9819CC22254F180F008A7C8E /* AbsoluteTouchHandler.m in Sources */,
 				9819CC14254F107A008A7C8E /* RelativeTouchHandler.m in Sources */,
+				A1D0DEAE2E06018400086726 /* Frame.m in Sources */,
 				FB1A674D2131E65900507771 /* KeyboardSupport.m in Sources */,
 				FB89463219F646E200339C8A /* VideoDecoderRenderer.m in Sources */,
+				A12476D32E14959E008D54F5 /* MetalViewController.m in Sources */,
 				FB290D0419B2C406004C83CF /* AppDelegate.m in Sources */,
+				A156D04A2E2C72DD002E7CA1 /* Shaders-Linear.metal in Sources */,
 				FB9AFD401A7E127D00872C98 /* AppListResponse.m in Sources */,
 				FB89463419F646E200339C8A /* Utils.m in Sources */,
 				FBDE86E619F82297001C18A8 /* UIAppView.m in Sources */,
 				FB89462F19F646E200339C8A /* Connection.m in Sources */,
+				A19562AD2DE6EDDC005FD7D8 /* imgui_impl_metal.mm in Sources */,
 				FB9AFD321A7D867C00872C98 /* AppAssetRetriever.m in Sources */,
 				FB4678FF1A565DAC00377732 /* WakeOnLanManager.m in Sources */,
 				FB53E1431BE5DC4400CD6ECE /* IdManager.m in Sources */,
@@ -911,11 +1134,19 @@
 				FBDE86E019F7A837001C18A8 /* UIComputerView.m in Sources */,
 				FB89463019F646E200339C8A /* StreamConfiguration.m in Sources */,
 				FBD3495319FF36FB002D2A60 /* SWRevealViewController.m in Sources */,
+				A12025C02DD7E370005015C8 /* ImGuiRenderer.mm in Sources */,
 				FB1D59971BBCCB6400F482CA /* ComputerScrollView.m in Sources */,
 				FBD3495019FF2174002D2A60 /* SettingsViewController.m in Sources */,
 				FB89462C19F646E200339C8A /* HttpManager.m in Sources */,
+				A1A777DC2DDBEC5500E071D8 /* imgui_widgets.cpp in Sources */,
+				A1A777DD2DDBEC5500E071D8 /* imgui_demo.cpp in Sources */,
+				A1A777DF2DDBEC5500E071D8 /* imgui.cpp in Sources */,
+				A1A777E02DDBEC5500E071D8 /* imgui_draw.cpp in Sources */,
+				A1A777E12DDBEC5500E071D8 /* imgui_tables.cpp in Sources */,
+				A12476E42E161986008D54F5 /* ImGuiPlots.mm in Sources */,
 				FB89462D19F646E200339C8A /* MDNSManager.m in Sources */,
 				FB89462B19F646E200339C8A /* StreamView.m in Sources */,
+				A1D406AF2E0A77AC00DC0A77 /* FrameQueue.m in Sources */,
 				FB4678FA1A55FFAD00377732 /* DiscoveryManager.m in Sources */,
 				98D5856D1C0EA79600F6CC00 /* TemporaryHost.m in Sources */,
 				FB89463519F646E200339C8A /* MainFrameViewController.m in Sources */,
@@ -933,13 +1164,18 @@
 				FB290D0019B2C406004C83CF /* main.m in Sources */,
 				9896219723D15C7000211983 /* X1Kit.swift in Sources */,
 				FBD3494319FC9C04002D2A60 /* AppAssetManager.m in Sources */,
+				A12476D72E1495AA008D54F5 /* MetalView.m in Sources */,
+				A1967D9B2DEE419F00EFC5CF /* FloatBuffer.m in Sources */,
+				A12476DE2E14D0B5008D54F5 /* Shaders.metal in Sources */,
 				FB6549561A57907E001C8F39 /* DiscoveryWorker.m in Sources */,
 				FB89462A19F646E200339C8A /* ControllerSupport.m in Sources */,
+				A1C760BE2E10FAB600110E0E /* MetalVideoRenderer.m in Sources */,
 				FB9AFD3D1A7E111600872C98 /* AppAssetResponse.m in Sources */,
 				FBD349621A0089F6002D2A60 /* DataManager.m in Sources */,
 				FB4A23B81A9D3637004D2EF2 /* LoadingFrameViewController.m in Sources */,
 				FB9AFD3A1A7E05CE00872C98 /* ServerInfoResponse.m in Sources */,
 				FB89463119F646E200339C8A /* StreamManager.m in Sources */,
+				A10BC62D2DE8E65800905783 /* BandwidthTracker.m in Sources */,
 				988FCD41293B091B003050E2 /* KeyboardInputField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -951,6 +1187,11 @@
 			isa = PBXTargetDependency;
 			name = "moonlight-common";
 			targetProxy = 98AB2E851CAD468B0089BB98 /* PBXContainerItemProxy */;
+		};
+		A13F90E72DFD2DE10010BB0F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB290CED19B2C406004C83CF /* Moonlight */;
+			targetProxy = A13F90E62DFD2DE10010BB0F /* PBXContainerItemProxy */;
 		};
 		FB1A68172132509800507771 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -979,6 +1220,71 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		A13F90E92DFD2DE10010BB0F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/moonlight-common/moonlight-common-c/src";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moonlight-stream.MoonlightTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Moonlight.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Moonlight";
+			};
+			name = Debug;
+		};
+		A13F90EA2DFD2DE10010BB0F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/moonlight-common/moonlight-common-c/src";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moonlight-stream.MoonlightTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Moonlight.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Moonlight";
+			};
+			name = Release;
+		};
 		FB1A67662132419A00507771 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -986,13 +1292,13 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Launch Image";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1001,6 +1307,7 @@
 					"$(PROJECT_DIR)/moonlight-common/moonlight-common-c/src",
 					"$(SDKROOT)/usr/include/libxml2/**",
 					"$(PROJECT_DIR)/libs/**",
+					"$(PROJECT_DIR)/third_party/imgui",
 				);
 				INFOPLIST_FILE = "Moonlight TV/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
@@ -1021,8 +1328,7 @@
 					"$(PROJECT_DIR)/libs/FFmpeg/lib/tvOS-Sim",
 				);
 				MARKETING_VERSION = 9.0.2;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				PRODUCT_BUNDLE_IDENTIFIER = com.moonlight-stream.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Limelight/Input/Moonlight-Bridging-Header.h";
@@ -1030,7 +1336,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 17.6;
 			};
 			name = Debug;
 		};
@@ -1041,14 +1347,14 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Launch Image";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1057,6 +1363,7 @@
 					"$(PROJECT_DIR)/moonlight-common/moonlight-common-c/src",
 					"$(SDKROOT)/usr/include/libxml2/**",
 					"$(PROJECT_DIR)/libs/**",
+					"$(PROJECT_DIR)/third_party/imgui",
 				);
 				INFOPLIST_FILE = "Moonlight TV/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
@@ -1077,8 +1384,7 @@
 					"$(PROJECT_DIR)/libs/FFmpeg/lib/tvOS-Sim",
 				);
 				MARKETING_VERSION = 9.0.2;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				PRODUCT_BUNDLE_IDENTIFIER = com.moonlight-stream.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1086,7 +1392,7 @@
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "Moonlight-Swift.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 17.6;
 			};
 			name = Release;
 		};
@@ -1128,6 +1434,8 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
+					"CA_DEBUG_TRANSACTIONS=1",
+					"CA_ASSERT_MAIN_THREAD_TRANSACTIONS=1",
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1138,7 +1446,13 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D_POSIX_C_SOURCE=200809L",
+					"-D_DARWIN_C_SOURCE",
+				);
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "";
 				SWIFT_VERSION = 4.0;
@@ -1191,6 +1505,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D_POSIX_C_SOURCE=200809L",
+					"-D_DARWIN_C_SOURCE",
+				);
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "";
@@ -1208,18 +1527,25 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
+				ENABLE_TESTABILITY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Limelight/Limelight-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(PROJECT_DIR)/moonlight-common/moonlight-common-c/src",
-					"$(SDKROOT)/usr/include/libxml2/**",
+					"$(SDKROOT)/usr/include/libxml2",
 					"$(PROJECT_DIR)/libs/**",
+					"$(PROJECT_DIR)/third_party/imgui",
 				);
 				INFOPLIST_FILE = "Limelight/Limelight-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1237,7 +1563,8 @@
 					"$(PROJECT_DIR)/libs/FFmpeg/lib/iOS-Sim",
 				);
 				MARKETING_VERSION = 9.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moonlight-stream.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = NO;
@@ -1258,18 +1585,20 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DM46QST4M7;
+				DEVELOPMENT_TEAM = PPLPFKSLF9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Limelight/Limelight-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(PROJECT_DIR)/moonlight-common/moonlight-common-c/src",
-					"$(SDKROOT)/usr/include/libxml2/**",
+					"$(SDKROOT)/usr/include/libxml2",
 					"$(PROJECT_DIR)/libs/**",
+					"$(PROJECT_DIR)/third_party/imgui",
 				);
 				INFOPLIST_FILE = "Limelight/Limelight-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1287,7 +1616,8 @@
 					"$(PROJECT_DIR)/libs/FFmpeg/lib/iOS-Sim",
 				);
 				MARKETING_VERSION = 9.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moonlight-stream.Moonlight";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moonlight-stream.Moonlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = NO;
@@ -1304,6 +1634,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A13F90E82DFD2DE10010BB0F /* Build configuration list for PBXNativeTarget "MoonlightTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A13F90E92DFD2DE10010BB0F /* Debug */,
+				A13F90EA2DFD2DE10010BB0F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		FB1A67682132419A00507771 /* Build configuration list for PBXNativeTarget "Moonlight TV" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

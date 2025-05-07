@@ -63,12 +63,15 @@
                  swapABXYButtons:(BOOL)swapABXYButtons
                        audioOnPC:(BOOL)audioOnPC
                   preferredCodec:(uint32_t)preferredCodec
-                  useFramePacing:(BOOL)useFramePacing
+                  frameQueueSize:(NSInteger)frameQueueSize
                        enableHdr:(BOOL)enableHdr
+                    enableYUV444:(BOOL)enableYUV444
                   btMouseSupport:(BOOL)btMouseSupport
                absoluteTouchMode:(BOOL)absoluteTouchMode
-                    statsOverlay:(BOOL)statsOverlay {
-    
+                    statsOverlay:(BOOL)statsOverlay
+                    enableGraphs:(BOOL)enableGraphs
+                    graphOpacity:(NSInteger)graphOpacity
+{
     [_managedObjectContext performBlockAndWait:^{
         Settings* settingsToSave = [self retrieveSettings];
         settingsToSave.framerate = [NSNumber numberWithInteger:framerate];
@@ -82,12 +85,14 @@
         settingsToSave.swapABXYButtons = swapABXYButtons;
         settingsToSave.playAudioOnPC = audioOnPC;
         settingsToSave.preferredCodec = preferredCodec;
-        settingsToSave.useFramePacing = useFramePacing;
+        settingsToSave.frameQueueSize = [NSNumber numberWithInteger:frameQueueSize];
         settingsToSave.enableHdr = enableHdr;
+        settingsToSave.enableYUV444 = enableYUV444;
         settingsToSave.btMouseSupport = btMouseSupport;
         settingsToSave.absoluteTouchMode = absoluteTouchMode;
         settingsToSave.statsOverlay = statsOverlay;
-        
+        settingsToSave.enableGraphs = enableGraphs;
+        settingsToSave.graphOpacity = [NSNumber numberWithInteger:graphOpacity];
         [self saveData];
     }];
 }

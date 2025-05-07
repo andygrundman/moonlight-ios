@@ -608,10 +608,10 @@ static NSMutableSet* hostList;
     _streamConfig.appID = app.id;
     _streamConfig.appName = app.name;
     _streamConfig.serverCert = app.host.serverCert;
-    
+
     DataManager* dataMan = [[DataManager alloc] init];
     TemporarySettings* streamSettings = [dataMan getSettings];
-    
+
     _streamConfig.frameRate = [streamSettings.framerate intValue];
     if (@available(iOS 10.3, *)) {
         // Don't stream more FPS than the display can show
@@ -620,7 +620,7 @@ static NSMutableSet* hostList;
             Log(LOG_W, @"Clamping FPS to maximum refresh rate: %d", _streamConfig.frameRate);
         }
     }
-    
+
     _streamConfig.height = [streamSettings.height intValue];
     _streamConfig.width = [streamSettings.width intValue];
 #if TARGET_OS_TV
@@ -633,21 +633,20 @@ static NSMutableSet* hostList;
         _streamConfig.height = 1080;
     }
 #endif
-    
+
     _streamConfig.bitRate = [streamSettings.bitrate intValue];
     _streamConfig.optimizeGameSettings = streamSettings.optimizeGames;
     _streamConfig.playAudioOnPC = streamSettings.playAudioOnPC;
-    _streamConfig.useFramePacing = streamSettings.useFramePacing;
     _streamConfig.swapABXYButtons = streamSettings.swapABXYButtons;
-    
+
     // multiController must be set before calling getConnectedGamepadMask
     _streamConfig.multiController = streamSettings.multiController;
     _streamConfig.gamepadMask = [ControllerSupport getConnectedGamepadMask:_streamConfig];
-    
+
     // Probe for supported channel configurations
     int physicalOutputChannels = (int)[AVAudioSession sharedInstance].maximumOutputNumberOfChannels;
     Log(LOG_I, @"Audio device supports %d channels", physicalOutputChannels);
-    
+
     int numberOfChannels = MIN([streamSettings.audioConfig intValue], physicalOutputChannels);
     Log(LOG_I, @"Selected number of audio channels %d", numberOfChannels);
     if (numberOfChannels >= 8) {
@@ -659,40 +658,49 @@ static NSMutableSet* hostList;
     else {
         _streamConfig.audioConfiguration = AUDIO_CONFIGURATION_STEREO;
     }
-    
+
     _streamConfig.serverCodecModeSupport = app.host.serverCodecModeSupport;
-    
+
     switch (streamSettings.preferredCodec) {
-        case CODEC_PREF_AV1:
+    case CODEC_PREF_AV1:
 #if defined(__IPHONE_16_0) || defined(__TVOS_16_0)
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_AV1)) {
-                _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_AV1_MAIN8;
-            }
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_AV1)) {
+            _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_AV1_MAIN8;
+        }
 #endif
-            // Fall-through
-            
-        case CODEC_PREF_AUTO:
-        case CODEC_PREF_HEVC:
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)) {
-                _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265;
+        // Fall-through
+
+    case CODEC_PREF_AUTO:
+    case CODEC_PREF_HEVC:
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)) {
+            _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265;
+            if (streamSettings.enableYUV444) {
+                _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT8_444;
             }
-            // Fall-through
-            
-        case CODEC_PREF_H264:
-            _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H264;
-            break;
+        }
+        // Fall-through
+
+    case CODEC_PREF_H264:
+        _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H264;
+        break;
     }
-    
+
     // HEVC is supported if the user wants it (or it's required by the chosen resolution) and the SoC supports it
     if ((_streamConfig.width > 4096 || _streamConfig.height > 4096 || streamSettings.enableHdr) && VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)) {
         _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265;
-        
+        if (streamSettings.enableYUV444) {
+            _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT8_444;
+        }
+
         // HEVC Main10 is supported if the user wants it and the display supports it
         if (streamSettings.enableHdr && (AVPlayer.availableHDRModes & AVPlayerHDRModeHDR10) != 0) {
             _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_MAIN10;
+            if (streamSettings.enableYUV444) {
+                _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT10_444;
+            }
         }
     }
-    
+
 #if defined(__IPHONE_16_0) || defined(__TVOS_16_0)
     // Add the AV1 Main10 format if AV1 and HDR are both enabled and supported
     if ((_streamConfig.supportedVideoFormats & VIDEO_FORMAT_MASK_AV1) && streamSettings.enableHdr &&
@@ -922,7 +930,14 @@ static NSMutableSet* hostList;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-        
+
+#if DEBUG
+    // Don't run the rest of the app when running unit tests
+    if (NSClassFromString(@"XCTest")) {
+        return;
+    }
+#endif
+
 #if !TARGET_OS_TV
     // Set the side bar button action. When it's tapped, it'll show the sidebar.
     [_settingsButton setTarget:self.revealViewController];
@@ -1404,12 +1419,6 @@ static NSMutableSet* hostList;
     [textField resignFirstResponder];
     return YES;
 }
-
-#if !TARGET_OS_TV
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-#endif
 
 - (void) disableNavigation {
     self.navigationController.navigationBar.topItem.rightBarButtonItem.enabled = NO;

@@ -19,6 +19,7 @@
 @property int width;
 @property int height;
 @property int frameRate;
+@property int frameRateX100;
 @property int bitRate;
 @property int riKeyId;
 @property NSData* riKey;
@@ -29,7 +30,6 @@
 @property int audioConfiguration;
 @property int supportedVideoFormats;
 @property BOOL multiController;
-@property BOOL useFramePacing;
 @property NSData* serverCert;
 
 @end

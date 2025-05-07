@@ -13,6 +13,9 @@
 #import "ControllerSupport.h"
 #import "DataManager.h"
 #import "PaddedLabel.h"
+#import "ImGuiRenderer.h"
+#import "RelativeTouchHandler.h"
+#import "MetalVideoRenderer.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -37,9 +40,6 @@
     TemporarySettings *_settings;
     NSTimer *_inactivityTimer;
     NSTimer *_statsUpdateTimer;
-    UITapGestureRecognizer *_menuTapGestureRecognizer;
-    UITapGestureRecognizer *_menuDoubleTapGestureRecognizer;
-    UITapGestureRecognizer *_playPauseTapGestureRecognizer;
     PaddedLabel *_overlayView;
     UILabel *_stageLabel;
     UILabel *_tipLabel;
@@ -48,10 +48,21 @@
     UIScrollView *_scrollView;
     BOOL _userIsInteracting;
     CGSize _keyboardSize;
-    
-#if !TARGET_OS_TV
+    PlotMetrics _decodeMetrics;
+    PlotMetrics _frameDropMetrics;
+    PlotMetrics _frameQueueMetrics;
+
+#if TARGET_OS_TV
+    UITapGestureRecognizer *_menuTapGestureRecognizer;
+    UITapGestureRecognizer *_menuDoubleTapGestureRecognizer;
+    UITapGestureRecognizer *_playPauseTapGestureRecognizer;
+    UITapGestureRecognizer *_remoteDoubleSelectRecognizer;
+#else
     UIScreenEdgePanGestureRecognizer *_exitSwipeRecognizer;
+    UISwipeGestureRecognizer *_topSwipeRecognizer;
+    UISwipeGestureRecognizer *_topSwipeUpRecognizer;
 #endif
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -73,6 +84,14 @@
     Log(LOG_I, @"Play/Pause button pressed -- backing out of stream");
     [self returnToMainFrame];
 }
+- (void)remoteSelectButtonDoublePressed:(id)sender {
+    Log(LOG_I, @"Select button double-tapped -- toggling stats");
+    if (!self->_statsUpdateTimer) {
+        [self showStats];
+    } else {
+        [self hideStats];
+    }
+}
 #endif
 
 
@@ -85,7 +104,7 @@
     [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     _settings = [[[DataManager alloc] init] getSettings];
-    
+
     _stageLabel = [[UILabel alloc] init];
     [_stageLabel setUserInteractionEnabled:NO];
     [_stageLabel setText:[NSString stringWithFormat:@"Starting %@...", self.streamConfig.appName]];
@@ -99,7 +118,7 @@
 #if TARGET_OS_TV
     [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
 #else
-    [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhite];
+    [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleMedium];
 #endif
     [_spinner sizeToFit];
     [_spinner startAnimating];
@@ -108,11 +127,8 @@
     _controllerSupport = [[ControllerSupport alloc] initWithConfig:self.streamConfig delegate:self];
     _inactivityTimer = nil;
     
-    _streamView = [[StreamView alloc] initWithFrame:self.view.frame];
-    [_streamView setupStreamView:_controllerSupport interactionDelegate:self config:self.streamConfig];
-    
 #if TARGET_OS_TV
-    if (!_menuTapGestureRecognizer || !_menuDoubleTapGestureRecognizer || !_playPauseTapGestureRecognizer) {
+    if (!_menuTapGestureRecognizer || !_menuDoubleTapGestureRecognizer || !_playPauseTapGestureRecognizer || !_remoteDoubleSelectRecognizer) {
         _menuTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(controllerPauseButtonPressed:)];
         _menuTapGestureRecognizer.allowedPressTypes = @[@(UIPressTypeMenu)];
 
@@ -123,11 +139,16 @@
         _menuDoubleTapGestureRecognizer.numberOfTapsRequired = 2;
         [_menuTapGestureRecognizer requireGestureRecognizerToFail:_menuDoubleTapGestureRecognizer];
         _menuDoubleTapGestureRecognizer.allowedPressTypes = @[@(UIPressTypeMenu)];
+
+        _remoteDoubleSelectRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(remoteSelectButtonDoublePressed:)];
+        _remoteDoubleSelectRecognizer.numberOfTapsRequired = 2;
+        _remoteDoubleSelectRecognizer.allowedPressTypes = @[@(UIPressTypeSelect)];
     }
     
     [self.view addGestureRecognizer:_menuTapGestureRecognizer];
     [self.view addGestureRecognizer:_menuDoubleTapGestureRecognizer];
     [self.view addGestureRecognizer:_playPauseTapGestureRecognizer];
+    [self.view addGestureRecognizer:_remoteDoubleSelectRecognizer];
 
 #else
     _exitSwipeRecognizer = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(edgeSwiped)];
@@ -136,15 +157,38 @@
     _exitSwipeRecognizer.delaysTouchesEnded = NO;
     
     [self.view addGestureRecognizer:_exitSwipeRecognizer];
+
+    _topSwipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(topSwiped)];
+    _topSwipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
+    _topSwipeRecognizer.numberOfTouchesRequired = 2;
+    _topSwipeRecognizer.enabled = TRUE;
+    [self.view addGestureRecognizer:_topSwipeRecognizer];
+
+    _topSwipeUpRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(topSwipedUp)];
+    _topSwipeUpRecognizer.direction = UISwipeGestureRecognizerDirectionUp;
+    _topSwipeUpRecognizer.numberOfTouchesRequired = 2;
+    _topSwipeUpRecognizer.enabled = FALSE;
+    // This is added to the _overlayView when displayed
 #endif
-    
+
+    _streamView = [[StreamView alloc] initWithFrame:self.view.frame];
+    [_streamView setupStreamView:_controllerSupport
+             interactionDelegate:self
+                          config:self.streamConfig];
+#if TARGET_OS_TV
+    // we need to tell the other remote handler in RelativeTouchHandler to wait for our double-select
+    RelativeTouchHandler *touchHandler = (RelativeTouchHandler *)[_streamView touchHandler];
+    UIGestureRecognizer *remotePressRecognizer = [touchHandler remotePressRecognizer];
+    [remotePressRecognizer requireGestureRecognizerToFail:_remoteDoubleSelectRecognizer];
+#endif
+
     _tipLabel = [[UILabel alloc] init];
     [_tipLabel setUserInteractionEnabled:NO];
     
 #if TARGET_OS_TV
-    [_tipLabel setText:@"Tip: Tap the Play/Pause button on the Apple TV Remote to disconnect from your PC"];
+    [_tipLabel setText:@"Tip: Tap the Play/Pause button on the Apple TV Remote to disconnect from your PC. Double-click Select for stats."];
 #else
-    [_tipLabel setText:@"Tip: Swipe from the left edge to disconnect from your PC"];
+    [_tipLabel setText:@"Tip: Swipe from the left edge to disconnect from your PC. Swipe down with 2 fingers for stats."];
 #endif
     
     [_tipLabel sizeToFit];
@@ -210,6 +254,25 @@
     [self.view addSubview:_stageLabel];
     [self.view addSubview:_spinner];
     [self.view addSubview:_tipLabel];
+
+    // Metal view for video
+    Log(LOG_I, @"StreamFrameViewController creating MetalViewController");
+    self.metalViewController = [[MetalViewController alloc] initWithFrame:self.view.bounds
+                                                                framerate:[self->_settings.framerate floatValue]
+                                                                enableHdr:self->_settings.enableHdr
+                                                           metricsHandler:self.imguiView.metricsHandler];
+    self.metalViewController.view.userInteractionEnabled = NO;
+    [self.view addSubview:self.metalViewController.view];
+    [self.view bringSubviewToFront:self.metalViewController.view];
+
+    // Make a MetalKit view for ImGui
+    self.imguiView = [[ImGuiRenderer alloc] initWithFrame:self.view.bounds
+                                                streamFps:[_settings.framerate intValue]
+                                             enableGraphs:_settings.enableGraphs
+                                             graphOpacity:[_settings.graphOpacity intValue]];
+    self.imguiView.mtkView.userInteractionEnabled = NO;
+    [self.view addSubview:self.imguiView.mtkView];
+    [self.view bringSubviewToFront:self.imguiView.mtkView];
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
@@ -266,12 +329,7 @@
     if (_overlayView == nil) {
         _overlayView = [[PaddedLabel alloc] initWithFrame:CGRectZero];
         [_overlayView setTextInsets:UIEdgeInsetsMake(10, 15, 10, 15)];
-        
-#if !TARGET_OS_TV
-        [_overlayView setEditable:NO];
-#endif
-        
-        [_overlayView setUserInteractionEnabled:NO];
+        [_overlayView setUserInteractionEnabled:YES];
         [_overlayView setNumberOfLines:100];
         [_overlayView.layer setCornerRadius:12];
         [_overlayView.layer setMasksToBounds:YES];
@@ -287,8 +345,12 @@
         [_overlayView setFont:[UIFont systemFontOfSize:24 weight:UIFontWeightMedium]];
 #else
         [_overlayView setFont:[UIFont systemFontOfSize:12 weight:UIFontWeightMedium]];
+
+        _topSwipeUpRecognizer.enabled = TRUE;
+        [_overlayView addGestureRecognizer:_topSwipeUpRecognizer];
 #endif
-        [_overlayView setAlpha:0.6];
+        int opacity = MAX([_settings.graphOpacity intValue], 60);
+        [_overlayView setAlpha:(float)opacity / 100.0];
         [self.view addSubview:_overlayView];
     }
     
@@ -316,7 +378,12 @@
     
     [_statsUpdateTimer invalidate];
     _statsUpdateTimer = nil;
-    
+
+#if !TARGET_OS_TV
+    _topSwipeRecognizer.enabled = FALSE;
+    _topSwipeUpRecognizer.enabled = FALSE;
+#endif
+
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
@@ -372,6 +439,58 @@
     [self returnToMainFrame];
 }
 
+- (void)topSwiped {
+    Log(LOG_I, @"User swiped/cicked down for stats");
+    [self showStats];
+
+#if !TARGET_OS_TV
+    _topSwipeRecognizer.enabled = FALSE;
+    _topSwipeUpRecognizer.enabled = TRUE;
+#endif
+}
+
+- (void)showStats {
+    if (self->_statsUpdateTimer == nil) {
+        self->_statsUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f
+                                                                   target:self
+                                                                 selector:@selector(updateStatsOverlay)
+                                                                 userInfo:nil
+                                                                  repeats:YES];
+        [self->_statsUpdateTimer fire];
+
+        if (_settings.enableGraphs) {
+            [self.imguiView start];
+            [self.imguiView show];
+        }
+    }
+}
+
+- (void)topSwipedUp {
+    Log(LOG_I, @"User swiped up to hide stats");
+    [self hideStats];
+
+#if !TARGET_OS_TV
+    _topSwipeRecognizer.enabled = TRUE;
+    _topSwipeUpRecognizer.enabled = FALSE;
+#endif
+}
+
+- (void)hideStats {
+    if (self->_statsUpdateTimer != nil) {
+        [_statsUpdateTimer invalidate];
+        _statsUpdateTimer = nil;
+    }
+
+    if (_overlayView != nil) {
+        [_overlayView setHidden:YES];
+    }
+
+    if (_settings.enableGraphs) {
+        [self.imguiView hide];
+        [self.imguiView stop];
+    }
+}
+
 - (void) connectionStarted {
     Log(LOG_I, @"Connection started");
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -385,11 +504,7 @@
         [self->_controllerSupport connectionEstablished];
         
         if (self->_settings.statsOverlay) {
-            self->_statsUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f
-                                                                       target:self
-                                                                     selector:@selector(updateStatsOverlay)
-                                                                     userInfo:nil
-                                                                      repeats:YES];
+            [self topSwiped];
         }
     });
 }
@@ -589,12 +704,30 @@
     });
 }
 
+- (void)applicationDidFinishSwitchingModes:(NSNotification *)notification {
+#if TARGET_OS_TV
+    // Check the current refresh rate of the TV for a fractional NTSC rate such as 59.94
+    UIScreen *screen = [UIScreen mainScreen];
+
+    // XXX: I can see screen.currentMode.refreshRate in the debugger, but don't know how to access it :(
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AVDisplayManagerModeSwitchEndNotification
+                                                  object:nil];
+#endif
+}
+
 - (void) updatePreferredDisplayMode:(BOOL)streamActive {
 #if TARGET_OS_TV
     if (@available(tvOS 11.2, *)) {
         UIWindow* window = [[[UIApplication sharedApplication] delegate] window];
         AVDisplayManager* displayManager = [window avDisplayManager];
-        
+
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(applicationDidFinishSwitchingModes:)
+                                                     name: AVDisplayManagerModeSwitchEndNotification
+                                                   object: nil];
+
         // This logic comes from Kodi and MrMC
         if (streamActive) {
             int dynamicRange;
@@ -605,8 +738,10 @@
             else {
                 dynamicRange = 0; // SDR
             }
-            
-            AVDisplayCriteria* displayCriteria = [[AVDisplayCriteria alloc] initWithRefreshRate:[_settings.framerate floatValue]
+
+            float refreshRate = [_settings.framerate floatValue];
+            Log(LOG_I, @"Changing TV refresh rate to %f Hz %@", refreshRate, dynamicRange == 2 ? @"HDR" : @"SDR");
+            AVDisplayCriteria* displayCriteria = [[AVDisplayCriteria alloc] initWithRefreshRate:refreshRate
                                                                               videoDynamicRange:dynamicRange];
             displayManager.preferredDisplayCriteria = displayCriteria;
         }
@@ -702,10 +837,6 @@
     }
     
     return NO;
-}
-
-- (BOOL)shouldAutorotate {
-    return YES;
 }
 
 - (BOOL)prefersPointerLocked {

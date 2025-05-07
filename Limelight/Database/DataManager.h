@@ -24,11 +24,14 @@
                  swapABXYButtons:(BOOL)swapABXYButtons
                        audioOnPC:(BOOL)audioOnPC
                   preferredCodec:(uint32_t)preferredCodec
-                  useFramePacing:(BOOL)useFramePacing
+                  frameQueueSize:(NSInteger)frameQueueSize
                        enableHdr:(BOOL)enableHdr
+                    enableYUV444:(BOOL)enableYUV444
                   btMouseSupport:(BOOL)btMouseSupport
                absoluteTouchMode:(BOOL)absoluteTouchMode
-                    statsOverlay:(BOOL)statsOverlay;
+                    statsOverlay:(BOOL)statsOverlay
+                    enableGraphs:(BOOL)enableGraphs
+                    graphOpacity:(NSInteger)graphOpacity;
 
 - (NSArray*) getHosts;
 - (void) updateHost:(TemporaryHost*)host;

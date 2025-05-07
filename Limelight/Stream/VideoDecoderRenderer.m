@@ -6,143 +6,148 @@
 //  Copyright (c) 2014 Moonlight Stream. All rights reserved.
 //
 
+@import AVFoundation;
+@import VideoToolbox;
+
+#import "DataManager.h"
+#import "TemporarySettings.h"
 #import "VideoDecoderRenderer.h"
+#import "FrameQueue.h"
 #import "StreamView.h"
+#import "Plot.h"
+#import "PlatformThreads.h"
+#import "MetalViewController.h"
+#import "ImGuiPlots.h"
 
 #include <libavcodec/avcodec.h>
 #include <libavcodec/cbs.h>
 #include <libavcodec/cbs_av1.h>
 #include <libavformat/avio.h>
 #include <libavutil/mem.h>
+#include <mach/mach_time.h>
+
+// Define for extra logging related to frame pacing
+#define DISPLAYLINK_VERBOSE
 
 // Private libavformat API for writing the AV1 Codec Configuration Box
 extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
                               int write_seq_header);
 
 @implementation VideoDecoderRenderer {
+    dispatch_queue_t _sq, _vtq;
     StreamView* _view;
     id<ConnectionCallbacks> _callbacks;
     float _streamAspectRatio;
-    
-    AVSampleBufferDisplayLayer* displayLayer;
-    int videoFormat;
-    int frameRate;
-    
-    NSMutableArray *parameterSetBuffers;
-    NSData *masteringDisplayColorVolume;
-    NSData *contentLightLevelInfo;
-    CMVideoFormatDescriptionRef formatDesc;
-    
-    CADisplayLink* _displayLink;
-    BOOL framePacing;
+    int _videoFormat;
+    int _frameRate;
+
+    NSMutableArray *_parameterSetBuffers;
+    NSData *_masteringDisplayColorVolume;
+    NSData *_contentLightLevelInfo;
+    CMVideoFormatDescriptionRef _formatDesc;
+    VTDecompressionSessionRef _decompressionSession;
+
+    FrameQueue *_frameQueue;
 }
 
-- (void)reinitializeDisplayLayer
-{
-    CALayer *oldLayer = displayLayer;
-    
-    displayLayer = [[AVSampleBufferDisplayLayer alloc] init];
-    displayLayer.backgroundColor = [UIColor blackColor].CGColor;
-    
-    // Ensure the AVSampleBufferDisplayLayer is sized to preserve the aspect ratio
-    // of the video stream. We used to use AVLayerVideoGravityResizeAspect, but that
-    // respects the PAR encoded in the SPS which causes our computed video-relative
-    // touch location to be wrong in StreamView if the aspect ratio of the host
-    // desktop doesn't match the aspect ratio of the stream.
-    CGSize videoSize;
-    if (_view.bounds.size.width > _view.bounds.size.height * _streamAspectRatio) {
-        videoSize = CGSizeMake(_view.bounds.size.height * _streamAspectRatio, _view.bounds.size.height);
-    } else {
-        videoSize = CGSizeMake(_view.bounds.size.width, _view.bounds.size.width / _streamAspectRatio);
-    }
-    displayLayer.position = CGPointMake(CGRectGetMidX(_view.bounds), CGRectGetMidY(_view.bounds));
-    displayLayer.bounds = CGRectMake(0, 0, videoSize.width, videoSize.height);
-    displayLayer.videoGravity = AVLayerVideoGravityResize;
-
-    // Hide the layer until we get an IDR frame. This ensures we
-    // can see the loading progress label as the stream is starting.
-    displayLayer.hidden = YES;
-    
-    if (oldLayer != nil) {
-        // Switch out the old display layer with the new one
-        [_view.layer replaceSublayer:oldLayer with:displayLayer];
-    }
-    else {
-        [_view.layer addSublayer:displayLayer];
-    }
-    
-    if (formatDesc != nil) {
-        CFRelease(formatDesc);
-        formatDesc = nil;
-    }
-}
-
-- (id)initWithView:(StreamView*)view callbacks:(id<ConnectionCallbacks>)callbacks streamAspectRatio:(float)aspectRatio useFramePacing:(BOOL)useFramePacing
+- (id)initWithView:(StreamView*)view callbacks:(id<ConnectionCallbacks>)callbacks streamAspectRatio:(float)aspectRatio
 {
     self = [super init];
-    
+
+    _sq = dispatch_queue_create("com.moonlight.VideoDecoderRenderer",
+                                 dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0));
+
+    // Video decoder needs to run at the highest priority since DisplayLink waits on it
+    _vtq = dispatch_queue_create("com.moonlight.VideoDecoderRenderer.VTDecoder",
+                                dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0));
+
     _view = view;
     _callbacks = callbacks;
     _streamAspectRatio = aspectRatio;
-    framePacing = useFramePacing;
-    
-    parameterSetBuffers = [[NSMutableArray alloc] init];
-    
-    [self reinitializeDisplayLayer];
-    
+    _parameterSetBuffers = [[NSMutableArray alloc] init];
+
+    DataManager* dataMan = [[DataManager alloc] init];
+
+    _frameQueue = [FrameQueue sharedInstance];
+    [_frameQueue start];
+    [_frameQueue setHighWaterMark:(int)[[dataMan getSettings].frameQueueSize integerValue]];
+
+    if (_formatDesc != nil) {
+        CFRelease(_formatDesc);
+        _formatDesc = nil;
+    }
+
+    if (_decompressionSession != nil){
+        VTDecompressionSessionInvalidate(_decompressionSession);
+        CFRelease(_decompressionSession);
+        _decompressionSession = nil;
+    }
+
     return self;
 }
 
 - (void)setupWithVideoFormat:(int)videoFormat width:(int)videoWidth height:(int)videoHeight frameRate:(int)frameRate
 {
-    self->videoFormat = videoFormat;
-    self->frameRate = frameRate;
+    self->_videoFormat = videoFormat;
+    self->_frameRate = frameRate;
+
+    // reset plot data in case we've already used it for a previous renderer
+    [[ImGuiPlots sharedInstance] clearData];
+
+    // RENDER_METAL begins in StreamFrameViewController
 }
 
-- (void)start
-{
-    _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayLinkCallback:)];
-    if (@available(iOS 15.0, tvOS 15.0, *)) {
-        _displayLink.preferredFrameRateRange = CAFrameRateRangeMake(self->frameRate, self->frameRate, self->frameRate);
+- (void)setupDecompressionSessionWithAttributes:(NSDictionary *)destinationPixelBufferAttributes {
+    if (_decompressionSession != NULL) {
+        VTDecompressionSessionInvalidate(_decompressionSession);
+        CFRelease(_decompressionSession);
+        _decompressionSession = nil;
+    }
+
+    int status = VTDecompressionSessionCreate(kCFAllocatorDefault,
+                                              _formatDesc,
+                                              nil,
+                                              (__bridge CFDictionaryRef)destinationPixelBufferAttributes,
+                                              nil,
+                                              &_decompressionSession);
+    if (status != noErr) {
+        Log(LOG_E, @"Failed to create VTDecompressionSession, status %d", status);
+    }
+}
+
+- (void)setupDecompressionSession {
+#if TARGET_OS_SIMULATOR
+    NSNumber *pixelFormat = @(kCVPixelFormatType_32BGRA);
+#else
+    NSNumber *pixelFormat = nil;
+    if (self->_videoFormat & VIDEO_FORMAT_MASK_YUV444) {
+        pixelFormat = @(kCVPixelFormatType_444YpCbCr10BiPlanarVideoRange);
     }
     else {
-        _displayLink.preferredFramesPerSecond = self->frameRate;
+        pixelFormat = @(kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange);
     }
-    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+#endif
+
+    NSDictionary *destinationPixelBufferAttributes = @{
+        (id)kCVPixelBufferPixelFormatTypeKey : pixelFormat,
+        (id)kVTDecompressionPropertyKey_GeneratePerFrameHDRDisplayMetadata : @YES,
+        (id)kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder : @YES
+    };
+
+    return [self setupDecompressionSessionWithAttributes:destinationPixelBufferAttributes];
 }
 
-// TODO: Refactor this
 int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
 
-- (void)displayLinkCallback:(CADisplayLink *)sender
+- (void)cleanup
 {
-    VIDEO_FRAME_HANDLE handle;
-    PDECODE_UNIT du;
-    
-    while (LiPollNextVideoFrame(&handle, &du)) {
-        LiCompleteVideoFrame(handle, DrSubmitDecodeUnit(du));
-        
-        if (framePacing) {
-            // Calculate the actual display refresh rate
-            double displayRefreshRate = 1 / (_displayLink.targetTimestamp - _displayLink.timestamp);
-            
-            // Only pace frames if the display refresh rate is >= 90% of our stream frame rate.
-            // Battery saver, accessibility settings, or device thermals can cause the actual
-            // refresh rate of the display to drop below the physical maximum.
-            if (displayRefreshRate >= frameRate * 0.9f) {
-                // Keep one pending frame to smooth out gaps due to
-                // network jitter at the cost of 1 frame of latency
-                if (LiGetPendingVideoFrames() == 1) {
-                    break;
-                }
-            }
-        }
-    }
-}
+    [_frameQueue stop];
 
-- (void)stop
-{
-    [_displayLink invalidate];
+    if (_decompressionSession != NULL) {
+        VTDecompressionSessionInvalidate(_decompressionSession);
+        CFRelease(_decompressionSession);
+        _decompressionSession = nil;
+    }
 }
 
 #define NALU_START_PREFIX_SIZE 3
@@ -152,7 +157,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
 {
     OSStatus status;
     size_t oldOffset = CMBlockBufferGetDataLength(frameBuffer);
-    
+
     // Append a 4 byte buffer to the frame block for the length prefix
     status = CMBlockBufferAppendMemoryBlock(frameBuffer, NULL,
                                             NAL_LENGTH_PREFIX_SIZE,
@@ -162,7 +167,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         Log(LOG_E, @"CMBlockBufferAppendMemoryBlock failed: %d", (int)status);
         return;
     }
-    
+
     // Write the length prefix to the new buffer
     const int dataLength = nalLength - NALU_START_PREFIX_SIZE;
     const uint8_t lengthBytes[] = {(uint8_t)(dataLength >> 24), (uint8_t)(dataLength >> 16),
@@ -173,7 +178,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         Log(LOG_E, @"CMBlockBufferReplaceDataBytes failed: %d", (int)status);
         return;
     }
-    
+
     // Attach the data buffer to the frame buffer by reference
     status = CMBlockBufferAppendBufferReference(frameBuffer, dataBuffer, offset + NALU_START_PREFIX_SIZE, dataLength, 0);
     if (status != noErr) {
@@ -185,7 +190,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
 - (NSData*)getAv1CodecConfigurationBox:(NSData*)frameData  {
     AVIOContext* ioctx = NULL;
     int err;
-    
+
     err = avio_open_dyn_buf(&ioctx);
     if (err < 0) {
         Log(LOG_E, @"avio_open_dyn_buf() failed: %d", err);
@@ -198,13 +203,13 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         Log(LOG_E, @"ff_isom_write_av1c() failed: %d", err);
         // Fall-through to close and free buffer
     }
-    
+
     // Close the dynbuf and get the underlying buffer back (which we must free)
     uint8_t* av1cBuf = NULL;
     int av1cBufLen = avio_close_dyn_buf(ioctx, &av1cBuf);
-    
+
     Log(LOG_I, @"av1C block is %d bytes", av1cBufLen);
-    
+
     // Only return data if ff_isom_write_av1c() was successful
     NSData* data = nil;
     if (err >= 0 && av1cBufLen > 0) {
@@ -213,7 +218,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
     else {
         data = nil;
     }
-    
+
     av_free(av1cBuf);
     return data;
 }
@@ -228,11 +233,11 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         Log(LOG_E, @"ff_cbs_init() failed: %d", err);
         return nil;
     }
-    
+
     AVPacket avPacket = {};
     avPacket.data = (uint8_t*)frameData.bytes;
     avPacket.size = (int)frameData.length;
-    
+
     // Read the sequence header OBU
     CodedBitstreamFragment cbsFrag = {};
     err = ff_cbs_read_packet(cbsCtx, &cbsFrag, &avPacket);
@@ -241,16 +246,16 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         ff_cbs_close(&cbsCtx);
         return nil;
     }
-    
+
 #define SET_CFSTR_EXTENSION(key, value) extensions[(__bridge NSString*)key] = (__bridge NSString*)(value)
 #define SET_EXTENSION(key, value) extensions[(__bridge NSString*)key] = (value)
 
     SET_EXTENSION(kCMFormatDescriptionExtension_FormatName, @"av01");
-    
+
     // We use the value for YUV without alpha, same as Chrome
     // https://developer.apple.com/library/archive/qa/qa1183/_index.html
     SET_EXTENSION(kCMFormatDescriptionExtension_Depth, @24);
-    
+
     CodedBitstreamAV1Context* bitstreamCtx = (CodedBitstreamAV1Context*)cbsCtx->priv_data;
     AV1RawSequenceHeader* seqHeader = bitstreamCtx->sequence_header;
     if (seqHeader == NULL) {
@@ -259,121 +264,122 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         ff_cbs_close(&cbsCtx);
         return nil;
     }
-    
+
     switch (seqHeader->color_config.color_primaries) {
         case 1: // CP_BT_709
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_ColorPrimaries,
                                 kCMFormatDescriptionColorPrimaries_ITU_R_709_2);
             break;
-            
+
         case 6: // CP_BT_601
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_ColorPrimaries,
                                 kCMFormatDescriptionColorPrimaries_SMPTE_C);
             break;
-            
+
         case 9: // CP_BT_2020
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_ColorPrimaries,
                                 kCMFormatDescriptionColorPrimaries_ITU_R_2020);
             break;
-            
+
         default:
             Log(LOG_W, @"Unsupported color_primaries value: %d", seqHeader->color_config.color_primaries);
             break;
     }
-    
+
     switch (seqHeader->color_config.transfer_characteristics) {
         case 1: // TC_BT_709
         case 6: // TC_BT_601
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_TransferFunction,
                                 kCMFormatDescriptionTransferFunction_ITU_R_709_2);
             break;
-            
+
         case 7: // TC_SMPTE_240
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_TransferFunction,
                                 kCMFormatDescriptionTransferFunction_SMPTE_240M_1995);
             break;
-            
+
         case 8: // TC_LINEAR
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_TransferFunction,
                                 kCMFormatDescriptionTransferFunction_Linear);
             break;
-            
+
         case 14: // TC_BT_2020_10_BIT
         case 15: // TC_BT_2020_12_BIT
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_TransferFunction,
                                 kCMFormatDescriptionTransferFunction_ITU_R_2020);
             break;
-            
+
         case 16: // TC_SMPTE_2084
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_TransferFunction,
                                 kCMFormatDescriptionTransferFunction_SMPTE_ST_2084_PQ);
             break;
-            
+
         case 17: // TC_HLG
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_TransferFunction,
                                 kCMFormatDescriptionTransferFunction_ITU_R_2100_HLG);
             break;
-            
+
         default:
             Log(LOG_W, @"Unsupported transfer_characteristics value: %d", seqHeader->color_config.transfer_characteristics);
             break;
     }
-    
+
     switch (seqHeader->color_config.matrix_coefficients) {
         case 1: // MC_BT_709
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_YCbCrMatrix,
                                 kCMFormatDescriptionYCbCrMatrix_ITU_R_709_2);
             break;
-            
+
         case 6: // MC_BT_601
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_YCbCrMatrix,
                                 kCMFormatDescriptionYCbCrMatrix_ITU_R_601_4);
             break;
-            
+
         case 7: // MC_SMPTE_240
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_YCbCrMatrix,
                                 kCMFormatDescriptionYCbCrMatrix_SMPTE_240M_1995);
             break;
-            
+
         case 9: // MC_BT_2020_NCL
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_YCbCrMatrix,
                                 kCMFormatDescriptionYCbCrMatrix_ITU_R_2020);
             break;
-            
+
         default:
             Log(LOG_W, @"Unsupported matrix_coefficients value: %d", seqHeader->color_config.matrix_coefficients);
             break;
     }
-    
+
+    Log(LOG_I, @"AV1 video range: %@", seqHeader->color_config.color_range == 1 ? @"full" : @"limited");
     SET_EXTENSION(kCMFormatDescriptionExtension_FullRangeVideo, @(seqHeader->color_config.color_range == 1));
-    
+
     // Progressive content
     SET_EXTENSION(kCMFormatDescriptionExtension_FieldCount, @(1));
-    
+
     switch (seqHeader->color_config.chroma_sample_position) {
         case 1: // CSP_VERTICAL
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_ChromaLocationTopField,
                                 kCMFormatDescriptionChromaLocation_Left);
             break;
-            
+
         case 2: // CSP_COLOCATED
             SET_CFSTR_EXTENSION(kCMFormatDescriptionExtension_ChromaLocationTopField,
                                 kCMFormatDescriptionChromaLocation_TopLeft);
             break;
-            
+
         default:
             Log(LOG_W, @"Unsupported chroma_sample_position value: %d", seqHeader->color_config.chroma_sample_position);
             break;
     }
-    
-    if (contentLightLevelInfo) {
-        SET_EXTENSION(kCMFormatDescriptionExtension_ContentLightLevelInfo, contentLightLevelInfo);
+
+    if (_contentLightLevelInfo) {
+        SET_EXTENSION(kCMFormatDescriptionExtension_ContentLightLevelInfo, _contentLightLevelInfo);
     }
-    
-    if (masteringDisplayColorVolume) {
-        SET_EXTENSION(kCMFormatDescriptionExtension_MasteringDisplayColorVolume, masteringDisplayColorVolume);
+
+    if (_masteringDisplayColorVolume) {
+        SET_EXTENSION(kCMFormatDescriptionExtension_MasteringDisplayColorVolume, _masteringDisplayColorVolume);
     }
-    
+
     // Referenced the VP9 code in Chrome that performs a similar function
     // https://source.chromium.org/chromium/chromium/src/+/main:media/gpu/mac/vt_config_util.mm;drc=977dc02c431b4979e34c7792bc3d646f649dacb4;l=155
     extensions[(__bridge NSString*)kCMFormatDescriptionExtension_SampleDescriptionExtensionAtoms] =
@@ -381,10 +387,10 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         @"av1C" : [self getAv1CodecConfigurationBox:frameData],
     };
     extensions[@"BitsPerComponent"] = @(bitstreamCtx->bit_depth);
-    
+
 #undef SET_EXTENSION
 #undef SET_CFSTR_EXTENSION
-    
+
     // AV1 doesn't have a special format description function like H.264 and HEVC have, so we just use the generic one
     CMVideoFormatDescriptionRef formatDesc = NULL;
     OSStatus status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault, kCMVideoCodecType_AV1,
@@ -395,161 +401,161 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         Log(LOG_E, @"Failed to create AV1 format description: %d", (int)status);
         formatDesc = NULL;
     }
-    
+
+    LogOnce(LOG_I, @"AV1 extensions: %@", extensions);
+    LogOnce(LOG_I, @"AV1 format description: %@", formatDesc);
+
     ff_cbs_fragment_free(&cbsFrag);
     ff_cbs_close(&cbsCtx);
     return formatDesc;
 }
 
+#pragma mark VideoRecv thread - Decoder
+
 // This function must free data for bufferType == BUFFER_TYPE_PICDATA
-- (int)submitDecodeBuffer:(unsigned char *)data length:(int)length bufferType:(int)bufferType decodeUnit:(PDECODE_UNIT)du
+- (int)submitDecodeBuffer:(unsigned char *)data
+                   length:(int)length
+               bufferType:(int)bufferType
+               decodeUnit:(PDECODE_UNIT)du
+          decodeStartTime:(CFTimeInterval)decodeStartTime
 {
     OSStatus status;
-    
+
     // Construct a new format description object each time we receive an IDR frame
     if (du->frameType == FRAME_TYPE_IDR) {
         if (bufferType != BUFFER_TYPE_PICDATA) {
             if (bufferType == BUFFER_TYPE_VPS || bufferType == BUFFER_TYPE_SPS || bufferType == BUFFER_TYPE_PPS) {
                 // Add new parameter set into the parameter set array
                 int startLen = data[2] == 0x01 ? 3 : 4;
-                [parameterSetBuffers addObject:[NSData dataWithBytes:&data[startLen] length:length - startLen]];
+                [_parameterSetBuffers addObject:[NSData dataWithBytes:&data[startLen] length:length - startLen]];
             }
-            
+
             // Data is NOT to be freed here. It's a direct usage of the caller's buffer.
-            
+
             // No frame data to submit for these NALUs
             return DR_OK;
         }
-        
+
         // Create the new format description when we get the first picture data buffer of an IDR frame.
         // This is the only way we know that there is no more CSD for this frame.
         //
         // NB: This logic depends on the fact that we submit all picture data in one buffer!
-        
+
         // Free the old format description
-        if (formatDesc != NULL) {
-            CFRelease(formatDesc);
-            formatDesc = NULL;
+        if (_formatDesc != NULL) {
+            CFRelease(_formatDesc);
+            _formatDesc = NULL;
         }
-        
-        if (videoFormat & VIDEO_FORMAT_MASK_H264) {
+
+        if (_videoFormat & VIDEO_FORMAT_MASK_H264) {
             // Construct parameter set arrays for the format description
-            size_t parameterSetCount = [parameterSetBuffers count];
+            size_t parameterSetCount = [_parameterSetBuffers count];
             const uint8_t* parameterSetPointers[parameterSetCount];
             size_t parameterSetSizes[parameterSetCount];
             for (int i = 0; i < parameterSetCount; i++) {
-                NSData* parameterSet = parameterSetBuffers[i];
+                NSData* parameterSet = _parameterSetBuffers[i];
                 parameterSetPointers[i] = parameterSet.bytes;
                 parameterSetSizes[i] = parameterSet.length;
             }
-            
+
             Log(LOG_I, @"Constructing new H264 format description");
             status = CMVideoFormatDescriptionCreateFromH264ParameterSets(kCFAllocatorDefault,
                                                                          parameterSetCount,
                                                                          parameterSetPointers,
                                                                          parameterSetSizes,
                                                                          NAL_LENGTH_PREFIX_SIZE,
-                                                                         &formatDesc);
+                                                                         &_formatDesc);
             if (status != noErr) {
                 Log(LOG_E, @"Failed to create H264 format description: %d", (int)status);
-                formatDesc = NULL;
+                _formatDesc = NULL;
             }
-            
+
+            LogOnce(LOG_I, @"H264 format description: %@", _formatDesc);
+
             // Free parameter set buffers after submission
-            [parameterSetBuffers removeAllObjects];
+            [_parameterSetBuffers removeAllObjects];
         }
-        else if (videoFormat & VIDEO_FORMAT_MASK_H265) {
+        else if (_videoFormat & VIDEO_FORMAT_MASK_H265) {
             // Construct parameter set arrays for the format description
-            size_t parameterSetCount = [parameterSetBuffers count];
+            size_t parameterSetCount = [_parameterSetBuffers count];
             const uint8_t* parameterSetPointers[parameterSetCount];
             size_t parameterSetSizes[parameterSetCount];
             for (int i = 0; i < parameterSetCount; i++) {
-                NSData* parameterSet = parameterSetBuffers[i];
+                NSData* parameterSet = _parameterSetBuffers[i];
                 parameterSetPointers[i] = parameterSet.bytes;
                 parameterSetSizes[i] = parameterSet.length;
             }
-            
+
             Log(LOG_I, @"Constructing new HEVC format description");
-            
+
             NSMutableDictionary* videoFormatParams = [[NSMutableDictionary alloc] init];
-            
-            if (contentLightLevelInfo) {
-                [videoFormatParams setObject:contentLightLevelInfo forKey:(__bridge NSString*)kCMFormatDescriptionExtension_ContentLightLevelInfo];
+
+            if (_contentLightLevelInfo) {
+                [videoFormatParams setObject:_contentLightLevelInfo forKey:(__bridge NSString*)kCMFormatDescriptionExtension_ContentLightLevelInfo];
             }
-            
-            if (masteringDisplayColorVolume) {
-                [videoFormatParams setObject:masteringDisplayColorVolume forKey:(__bridge NSString*)kCMFormatDescriptionExtension_MasteringDisplayColorVolume];
+
+            if (_masteringDisplayColorVolume) {
+                [videoFormatParams setObject:_masteringDisplayColorVolume forKey:(__bridge NSString*)kCMFormatDescriptionExtension_MasteringDisplayColorVolume];
             }
-            
+
             status = CMVideoFormatDescriptionCreateFromHEVCParameterSets(kCFAllocatorDefault,
                                                                          parameterSetCount,
                                                                          parameterSetPointers,
                                                                          parameterSetSizes,
                                                                          NAL_LENGTH_PREFIX_SIZE,
                                                                          (__bridge CFDictionaryRef)videoFormatParams,
-                                                                         &formatDesc);
-            
+                                                                         &_formatDesc);
+
             if (status != noErr) {
                 Log(LOG_E, @"Failed to create HEVC format description: %d", (int)status);
-                formatDesc = NULL;
+                _formatDesc = NULL;
             }
-            
+
+            LogOnce(LOG_I, @"HEVC format description: %@", _formatDesc);
+
             // Free parameter set buffers after submission
-            [parameterSetBuffers removeAllObjects];
+            [_parameterSetBuffers removeAllObjects];
         }
-        else if (videoFormat & VIDEO_FORMAT_MASK_AV1) {
+        else if (_videoFormat & VIDEO_FORMAT_MASK_AV1) {
             NSData* fullFrameData = [NSData dataWithBytesNoCopy:data length:length freeWhenDone:NO];
-            
+
             Log(LOG_I, @"Constructing new AV1 format description");
-            formatDesc = [self createAV1FormatDescriptionForIDRFrame:fullFrameData];
+            _formatDesc = [self createAV1FormatDescriptionForIDRFrame:fullFrameData];
         }
         else {
             // Unsupported codec!
             abort();
         }
     }
-    
-    if (formatDesc == NULL) {
+
+    if (_formatDesc == NULL) {
         // Can't decode if we haven't gotten our parameter sets yet
         free(data);
         return DR_NEED_IDR;
     }
-    
-    // Check for previous decoder errors before doing anything
-    if (displayLayer.status == AVQueuedSampleBufferRenderingStatusFailed) {
-        Log(LOG_E, @"Display layer rendering failed: %@", displayLayer.error);
-        
-        // Recreate the display layer. We are already on the main thread,
-        // so this is safe to do right here.
-        [self reinitializeDisplayLayer];
-        
-        // Request an IDR frame to initialize the new decoder
-        free(data);
-        return DR_NEED_IDR;
-    }
-    
+
     // Now we're decoding actual frame data here
     CMBlockBufferRef frameBlockBuffer;
     CMBlockBufferRef dataBlockBuffer;
-    
+
     status = CMBlockBufferCreateWithMemoryBlock(NULL, data, length, kCFAllocatorDefault, NULL, 0, length, 0, &dataBlockBuffer);
     if (status != noErr) {
         Log(LOG_E, @"CMBlockBufferCreateWithMemoryBlock failed: %d", (int)status);
         free(data);
         return DR_NEED_IDR;
     }
-    
+
     // From now on, CMBlockBuffer owns the data pointer and will free it when it's dereferenced
-    
+
     status = CMBlockBufferCreateEmpty(NULL, 0, 0, &frameBlockBuffer);
     if (status != noErr) {
         Log(LOG_E, @"CMBlockBufferCreateEmpty failed: %d", (int)status);
         CFRelease(dataBlockBuffer);
         return DR_NEED_IDR;
     }
-    
+
     // H.264 and HEVC formats require NAL prefix fixups from Annex B to length-delimited
-    if (videoFormat & (VIDEO_FORMAT_MASK_H264 | VIDEO_FORMAT_MASK_H265)) {
+    if (_videoFormat & (VIDEO_FORMAT_MASK_H264 | VIDEO_FORMAT_MASK_H265)) {
         int lastOffset = -1;
         for (int i = 0; i < length - NALU_START_PREFIX_SIZE; i++) {
             // Search for a NALU
@@ -559,11 +565,11 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
                     // We've seen a start before this so enqueue that NALU
                     [self updateAnnexBBufferForRange:frameBlockBuffer dataBlock:dataBlockBuffer offset:lastOffset length:i - lastOffset];
                 }
-                
+
                 lastOffset = i;
             }
         }
-        
+
         if (lastOffset != -1) {
             // Enqueue the remaining data
             [self updateAnnexBBufferForRange:frameBlockBuffer dataBlock:dataBlockBuffer offset:lastOffset length:length - lastOffset];
@@ -577,14 +583,19 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
             return DR_NEED_IDR;
         }
     }
-        
+
+    // Set the current frame's pts, in RTP 90khz units. We will set the duration
+    // later in FrameQueue because it requires the next frame's timestamp.
+    CMSampleTimingInfo sampleTiming = {
+        .duration              = kCMTimeInvalid,
+        .presentationTimeStamp = CMTimeMake((int64_t)du->rtpTimestamp, 90000),
+        .decodeTimeStamp       = kCMTimeInvalid,
+    };
+
     CMSampleBufferRef sampleBuffer;
-    
-    CMSampleTimingInfo sampleTiming = {kCMTimeInvalid, CMTimeMake(du->presentationTimeMs, 1000), kCMTimeInvalid};
-    
     status = CMSampleBufferCreateReady(kCFAllocatorDefault,
                                   frameBlockBuffer,
-                                  formatDesc, 1, 1,
+                                  _formatDesc, 1, 1,
                                   &sampleTiming, 0, NULL,
                                   &sampleBuffer);
     if (status != noErr) {
@@ -594,31 +605,79 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         return DR_NEED_IDR;
     }
 
-    // Enqueue the next frame
-    [self->displayLayer enqueueSampleBuffer:sampleBuffer];
-    
-    if (du->frameType == FRAME_TYPE_IDR) {
-        // Ensure the layer is visible now
-        self->displayLayer.hidden = NO;
-        
-        // Tell our parent VC to hide the progress indicator
-        [self->_callbacks videoContentShown];
-    }
-    
+    OSStatus decodeStatus = [self decodeFrameWithSampleBuffer:sampleBuffer
+                                                  frameNumber:du->frameNumber
+                                                    frameType:du->frameType
+                                              decodeStartTime:decodeStartTime];
     // Dereference the buffers
     CFRelease(dataBlockBuffer);
     CFRelease(frameBlockBuffer);
     CFRelease(sampleBuffer);
-    
-    return DR_OK;
+
+    return (decodeStatus == noErr) ? DR_OK : DR_NEED_IDR;
+}
+
+- (OSStatus)decodeFrameWithSampleBuffer:(CMSampleBufferRef)sampleBuffer
+                            frameNumber:(int)frameNumber
+                              frameType:(int)frameType
+                        decodeStartTime:(CFTimeInterval)decodeStartTime {
+  if (frameType == FRAME_TYPE_IDR || _decompressionSession == nil) {
+    [self setupDecompressionSession];
+  }
+
+  OSStatus status = VTDecompressionSessionDecodeFrameWithOutputHandler(
+      _decompressionSession,
+      sampleBuffer,
+      0,
+      NULL,
+      ^(OSStatus status, VTDecodeInfoFlags infoFlags, CVImageBufferRef _Nullable imageBuffer, CMTime presentationTimestamp, CMTime presentationDuration) {
+          if (status != noErr || !imageBuffer) {
+            NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+            Log(LOG_E, @"Decompression session error: %@", error);
+            LiRequestIdrFrame();
+            return;
+          }
+
+          // retain the pixelBuffer here so it survives the dispatch
+          CVPixelBufferRef pixelBuffer = CVPixelBufferRetain((CVPixelBufferRef)imageBuffer);
+
+          // Dispatch onto our higher priority queue
+          dispatch_async(self->_vtq, ^{
+              Frame *frame = [[Frame alloc] initWithPixelBufffer:pixelBuffer frameNumber:frameNumber frameType:frameType pts:presentationTimestamp];
+              [frame setFormatDesc:self->_formatDesc];
+
+              int framesDropped = [self->_frameQueue enqueue:frame withSlackSize:3];
+
+              static PlotMetrics frameQueueMetrics = {};
+              [[ImGuiPlots sharedInstance] observeFloatReturnMetrics:PLOT_QUEUED_FRAMES value:[self->_frameQueue count] plotMetrics:&frameQueueMetrics];
+              [self safeCopyMetricsTo:&self->_frameQueueMetrics from:&frameQueueMetrics];
+
+              [[ImGuiPlots sharedInstance] observeFloat:PLOT_DROPPED value:framesDropped];
+
+              // It's important we capture host metrics on the incoming thread, as this frame object
+              // may have been dropped by the above enqueue
+              static CFTimeInterval lastHostFrame = 0.0f;
+              if (lastHostFrame != 0) {
+                [[ImGuiPlots sharedInstance] observeFloat:PLOT_HOST_FRAMETIME value:(frame.pts - lastHostFrame) * 1000.0];
+              }
+              lastHostFrame = frame.pts;
+
+              // Decode time is not graphed because it is marked as hidden, but we can use the same mechanism for the value used by stats
+              static PlotMetrics decodeMetrics = {};
+              [[ImGuiPlots sharedInstance] observeFloatReturnMetrics:PLOT_DECODE value:(CACurrentMediaTime() - decodeStartTime) * 1000.0 plotMetrics:&decodeMetrics];
+              [self safeCopyMetricsTo:&self->_decodeMetrics from:&decodeMetrics];
+          });
+      });
+
+  return status;
 }
 
 - (void)setHdrMode:(BOOL)enabled {
     SS_HDR_METADATA hdrMetadata;
-    
+
     BOOL hasMetadata = enabled && LiGetHdrMetadata(&hdrMetadata);
     BOOL metadataChanged = NO;
-    
+
     if (hasMetadata && hdrMetadata.displayPrimaries[0].x != 0 && hdrMetadata.maxDisplayLuminance != 0) {
         // This data is all in big-endian
         struct {
@@ -644,16 +703,23 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         mdcv.luminance_min = __builtin_bswap32(hdrMetadata.minDisplayLuminance);
 
         NSData* newMdcv = [NSData dataWithBytes:&mdcv length:sizeof(mdcv)];
-        if (masteringDisplayColorVolume == nil || ![newMdcv isEqualToData:masteringDisplayColorVolume]) {
-            masteringDisplayColorVolume = newMdcv;
+        if (_masteringDisplayColorVolume == nil || ![newMdcv isEqualToData:_masteringDisplayColorVolume]) {
+            _masteringDisplayColorVolume = newMdcv;
             metadataChanged = YES;
+
+            Log(LOG_I, @"HDR Mastering Display Color Volume: G(%d,%d) B(%d,%d) R(%d,%d) white point(%d,%d) luminance (%d,%d)",
+                mdcv.primaries[0].x, mdcv.primaries[0].y,
+                mdcv.primaries[1].x, mdcv.primaries[1].y,
+                mdcv.primaries[2].x, mdcv.primaries[2].y,
+                mdcv.white_point.x, mdcv.white_point.y,
+                mdcv.luminance_max, mdcv.luminance_min);
         }
     }
-    else if (masteringDisplayColorVolume != nil) {
-        masteringDisplayColorVolume = nil;
+    else if (_masteringDisplayColorVolume != nil) {
+        _masteringDisplayColorVolume = nil;
         metadataChanged = YES;
     }
-    
+
     if (hasMetadata && hdrMetadata.maxContentLightLevel != 0 && hdrMetadata.maxFrameAverageLightLevel != 0) {
         // This data is all in big-endian
         struct {
@@ -665,20 +731,39 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
         cll.max_frame_average_light_level = __builtin_bswap16(hdrMetadata.maxFrameAverageLightLevel);
 
         NSData* newCll = [NSData dataWithBytes:&cll length:sizeof(cll)];
-        if (contentLightLevelInfo == nil || ![newCll isEqualToData:contentLightLevelInfo]) {
-            contentLightLevelInfo = newCll;
+        if (_contentLightLevelInfo == nil || ![newCll isEqualToData:_contentLightLevelInfo]) {
+            _contentLightLevelInfo = newCll;
             metadataChanged = YES;
+
+            Log(LOG_I, @"HDR maxCLL: %d maxFALL: %d",
+                cll.max_content_light_level, cll.max_frame_average_light_level);
         }
     }
-    else if (contentLightLevelInfo != nil) {
-        contentLightLevelInfo = nil;
+    else if (_contentLightLevelInfo != nil) {
+        _contentLightLevelInfo = nil;
         metadataChanged = YES;
     }
-    
+
     // If the metadata changed, request an IDR frame to re-create the CMVideoFormatDescription
     if (metadataChanged) {
         LiRequestIdrFrame();
     }
+}
+
+- (void)safeCopyMetricsTo:(PlotMetrics *)dst from:(PlotMetrics *)src {
+    if (dst != nil && src != nil) {
+        dispatch_sync(_sq, ^{
+            memcpy(dst, src, sizeof(PlotMetrics));
+        });
+    }
+}
+
+- (void)getAllStats:(video_stats_t *)stats {
+    dispatch_sync(_sq, ^{
+        memcpy(&stats->decodeMetrics, &_decodeMetrics, sizeof(PlotMetrics));
+        memcpy(&stats->frameQueueMetrics, &_frameQueueMetrics, sizeof(PlotMetrics));
+        [_frameQueue.frameDropMetrics copyMetrics:&stats->frameDropMetrics];
+    });
 }
 
 @end
