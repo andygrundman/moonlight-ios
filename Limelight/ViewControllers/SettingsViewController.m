@@ -242,6 +242,8 @@ BOOL isCustomResolution(CGSize res) {
         [self.hdrSelector setSelectedSegmentIndex:currentSettings.enableHdr ? 1 : 0];
     }
 
+    [self.yuv444Selector setSelectedSegmentIndex:currentSettings.enableYUV444 ? 1 : 0];
+    [self.yuv444Selector addTarget:self action:@selector(updateBitrate) forControlEvents:UIControlEventValueChanged];
     [self.touchModeSelector setSelectedSegmentIndex:currentSettings.absoluteTouchMode ? 1 : 0];
     [self.touchModeSelector addTarget:self action:@selector(touchModeChanged) forControlEvents:UIControlEventValueChanged];
     [self.statsOverlaySelector setSelectedSegmentIndex:currentSettings.statsOverlay ? 1 : 0];
@@ -290,6 +292,7 @@ BOOL isCustomResolution(CGSize res) {
     NSInteger fps = [self getChosenFrameRate];
     NSInteger width = [self getChosenStreamWidth];
     NSInteger height = [self getChosenStreamHeight];
+    BOOL yuv444 = [self.yuv444Selector selectedSegmentIndex] == 1 ? YES : NO;
     NSInteger defaultBitrate;
     
     // This logic is shamelessly stolen from Moonlight Qt:
@@ -339,6 +342,11 @@ BOOL isCustomResolution(CGSize res) {
             resolutionFactor = resTable[i-1].factor;
             break;
         }
+    }
+
+    if (yuv444) {
+        // This is rough estimation based on the fact that 4:4:4 doubles the amount of raw YUV data compared to 4:2:0
+        resolutionFactor *= 2;
     }
 
     defaultBitrate = round(resolutionFactor * frameRateFactor) * 1000;
@@ -581,6 +589,7 @@ BOOL isCustomResolution(CGSize res) {
     BOOL statsOverlay = [self.statsOverlaySelector selectedSegmentIndex] == 1;
     BOOL enableGraphs = [self.enableGraphsSelector selectedSegmentIndex] == 1;
     BOOL enableHdr = [self.hdrSelector selectedSegmentIndex] == 1;
+    BOOL enableYUV444 = [self.yuv444Selector selectedSegmentIndex] == 1;
     [dataMan saveSettingsWithBitrate:_bitrate
                            framerate:framerate
                               height:height
@@ -594,6 +603,7 @@ BOOL isCustomResolution(CGSize res) {
                       preferredCodec:preferredCodec
                       frameQueueSize:_frameQueueSize
                            enableHdr:enableHdr
+                        enableYUV444:enableYUV444
                       btMouseSupport:btMouseSupport
                    absoluteTouchMode:absoluteTouchMode
                         statsOverlay:statsOverlay

@@ -26,6 +26,7 @@
                   preferredCodec:(uint32_t)preferredCodec
                   frameQueueSize:(NSInteger)frameQueueSize
                        enableHdr:(BOOL)enableHdr
+                    enableYUV444:(BOOL)enableYUV444
                   btMouseSupport:(BOOL)btMouseSupport
                absoluteTouchMode:(BOOL)absoluteTouchMode
                     statsOverlay:(BOOL)statsOverlay

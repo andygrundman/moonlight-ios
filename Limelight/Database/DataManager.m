@@ -65,6 +65,7 @@
                   preferredCodec:(uint32_t)preferredCodec
                   frameQueueSize:(NSInteger)frameQueueSize
                        enableHdr:(BOOL)enableHdr
+                    enableYUV444:(BOOL)enableYUV444
                   btMouseSupport:(BOOL)btMouseSupport
                absoluteTouchMode:(BOOL)absoluteTouchMode
                     statsOverlay:(BOOL)statsOverlay
@@ -87,6 +88,7 @@
         settingsToSave.preferredCodec = preferredCodec;
         settingsToSave.frameQueueSize = [NSNumber numberWithInteger:frameQueueSize];
         settingsToSave.enableHdr = enableHdr;
+        settingsToSave.enableYUV444 = enableYUV444;
         settingsToSave.btMouseSupport = btMouseSupport;
         settingsToSave.absoluteTouchMode = absoluteTouchMode;
         settingsToSave.statsOverlay = statsOverlay;

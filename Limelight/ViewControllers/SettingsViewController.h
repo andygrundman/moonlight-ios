@@ -32,6 +32,7 @@
 @property (strong, nonatomic) IBOutlet UISegmentedControl *enableGraphsSelector;
 @property (strong, nonatomic) IBOutlet UIStepper *graphOpacityStepper;
 @property (strong, nonatomic) IBOutlet UISegmentedControl *renderingBackendSelector;
+@property (strong, nonatomic) IBOutlet UISegmentedControl *yuv444Selector;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"

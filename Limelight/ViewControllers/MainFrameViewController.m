@@ -674,7 +674,9 @@ static NSMutableSet* hostList;
     case CODEC_PREF_HEVC:
         if (VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)) {
             _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265;
-            //_streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT8_444;
+            if (streamSettings.enableYUV444) {
+                _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT8_444;
+            }
         }
         // Fall-through
 
@@ -686,12 +688,16 @@ static NSMutableSet* hostList;
     // HEVC is supported if the user wants it (or it's required by the chosen resolution) and the SoC supports it
     if ((_streamConfig.width > 4096 || _streamConfig.height > 4096 || streamSettings.enableHdr) && VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)) {
         _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265;
-        //_streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT8_444;
+        if (streamSettings.enableYUV444) {
+            _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT8_444;
+        }
 
         // HEVC Main10 is supported if the user wants it and the display supports it
         if (streamSettings.enableHdr && (AVPlayer.availableHDRModes & AVPlayerHDRModeHDR10) != 0) {
             _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_MAIN10;
-            //_streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT10_444;
+            if (streamSettings.enableYUV444) {
+                _streamConfig.supportedVideoFormats |= VIDEO_FORMAT_H265_REXT10_444;
+            }
         }
     }
 
