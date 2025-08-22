@@ -829,7 +829,7 @@ static const double MOUSE_SPEED_DIVISOR = 1.25;
     }
 }
 
--(void) unregisterMouseCallbacks:(GCMouse*)mouse API_AVAILABLE(ios(14.0)) {
+-(void) unregisterMouseCallbacks:(GCMouse*)mouse API_AVAILABLE(ios(14.0), tvos(14.0)) {
     mouse.mouseInput.mouseMovedHandler = nil;
     
     mouse.mouseInput.leftButton.pressedChangedHandler = nil;
@@ -846,7 +846,7 @@ static const double MOUSE_SPEED_DIVISOR = 1.25;
 #endif
 }
 
--(void) registerMouseCallbacks:(GCMouse*) mouse API_AVAILABLE(ios(14.0)) {
+-(void) registerMouseCallbacks:(GCMouse*) mouse API_AVAILABLE(ios(14.0), tvos(14.0)) {
     mouse.mouseInput.mouseMovedHandler = ^(GCMouseInput * _Nonnull mouse, float deltaX, float deltaY) {
         self->accumulatedDeltaX += deltaX / MOUSE_SPEED_DIVISOR;
         self->accumulatedDeltaY += -deltaY / MOUSE_SPEED_DIVISOR;

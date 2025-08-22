@@ -27,6 +27,8 @@
 			<string>ExtendedGamepad</string>
 		</dict>
 	</array>
+	<key>GCSupportsMouseAndKeyboard</key>
+	<true/>
 	<key>GCSupportsControllerUserInteraction</key>
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -39,9 +41,9 @@
 		<true/>
 	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Bluetooth access allows Moonlight to connect to Citrix X1 mice.</string>
+	<string>Bluetooth access allows Moonlight to connect to Bluetooth mice.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Bluetooth access allows Moonlight to connect to Citrix X1 mice.</string>
+	<string>Bluetooth access allows Moonlight to connect to Bluetooth mice.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_nvstream._tcp</string>
