@@ -231,9 +231,8 @@ inline static float getValue(void *buffer, int idx) {
     float *fbuffer = (float *)buffer;
     float v = fbuffer[idx];
     // clip the top of frametime graphs so they're less ugly
-    if (v > 50)
-        v = 49.9;
-
+    if (v > 60.0)
+        v = 59.5f;
     return v;
 }
 
@@ -396,6 +395,11 @@ inline static float getValue(void *buffer, int idx) {
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.16f, 0.29f, 0.48f, _graphOpacity)); // dark
         ImGui::PushStyleColor(ImGuiCol_PlotLines, ImVec4(0.0f, 1.0f, 0.0f, 1.0f)); // green
         if (i == PLOT_FRAMETIME || i == PLOT_HOST_FRAMETIME) {
+            // apply a moving average for some smoothing
+            const float alpha = 0.4f;
+            for (int i = 1; i < countF; i++) {
+                *buffers[i] = alpha * *buffers[i] + (1.0f - alpha) * *buffers[i-1];
+            }
             // getValue() clips at max 50
             ImGui::PlotLines("##xx", getValue, buffers[i], countF, 0, (countF > 0 ? label : "no data"), scaleMin, scaleMax, ImVec2(fullW, graphH));
         } else {

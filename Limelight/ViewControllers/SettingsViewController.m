@@ -247,8 +247,6 @@ BOOL isCustomResolution(CGSize res) {
     [self.touchModeSelector setSelectedSegmentIndex:currentSettings.absoluteTouchMode ? 1 : 0];
     [self.touchModeSelector addTarget:self action:@selector(touchModeChanged) forControlEvents:UIControlEventValueChanged];
     [self.statsOverlaySelector setSelectedSegmentIndex:currentSettings.statsOverlay ? 1 : 0];
-    NSInteger renderingBackend = [currentSettings.renderingBackend integerValue];
-    [self.renderingBackendSelector setSelectedSegmentIndex:renderingBackend];
     [self.enableGraphsSelector setSelectedSegmentIndex:currentSettings.enableGraphs ? 1 : 0];
     [self.enableGraphsSelector addTarget:self action:@selector(enableGraphsChanged) forControlEvents:UIControlEventValueChanged];
     [self enableGraphsChanged];
@@ -578,7 +576,6 @@ BOOL isCustomResolution(CGSize res) {
     NSInteger height = [self getChosenStreamHeight];
     NSInteger width = [self getChosenStreamWidth];
     NSInteger onscreenControls = [self.onscreenControlSelector selectedSegmentIndex];
-    NSInteger renderingBackend = [self.renderingBackendSelector selectedSegmentIndex];
     BOOL optimizeGames = [self.optimizeSettingsSelector selectedSegmentIndex] == 1;
     BOOL multiController = [self.multiControllerSelector selectedSegmentIndex] == 1;
     BOOL swapABXYButtons = [self.swapABXYButtonsSelector selectedSegmentIndex] == 1;
@@ -608,8 +605,7 @@ BOOL isCustomResolution(CGSize res) {
                    absoluteTouchMode:absoluteTouchMode
                         statsOverlay:statsOverlay
                         enableGraphs:enableGraphs
-                        graphOpacity:_graphOpacity
-                    renderingBackend:renderingBackend];
+                        graphOpacity:_graphOpacity];
 }
 
 - (void)didReceiveMemoryWarning {

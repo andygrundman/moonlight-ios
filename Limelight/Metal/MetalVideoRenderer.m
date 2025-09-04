@@ -545,6 +545,8 @@ CFStringRef __currentColorSpace;
         [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
         [renderEncoder endEncoding];
 
+#if !TARGET_OS_SIMULATOR
+        // Why can't the simulator support this?
         __block MetalVideoRenderer *strongSelf = self;
         [drawable addPresentedHandler:^(id<MTLDrawable> d) {
             if (strongSelf.lastPresented > 0.0f) {
@@ -553,6 +555,7 @@ CFStringRef __currentColorSpace;
             }
             strongSelf.lastPresented = d.presentedTime;
         }];
+#endif
 
         // signal semaphore, compute GPU time average, and clear textures
         __block dispatch_semaphore_t block_semaphore = _inFlightSemaphore;

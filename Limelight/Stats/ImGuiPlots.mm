@@ -36,7 +36,7 @@
             .side   = PLOT_LEFT,
             .unit   = "ms",
             .scaleMin = (1000.0 / 120) - 1,
-            .scaleMax = 50.0f, // (1000.0 / streamFps) * 3,
+            .scaleMax = 60.0f, // (1000.0 / streamFps) * 3,
             .buffer = [[FloatBuffer alloc] initWithCapacity:512]
         };
 
@@ -45,7 +45,7 @@
             .side   = PLOT_LEFT,
             .unit   = "ms",
             .scaleMin = (1000.0 / 120) - 1,
-            .scaleMax = 50.0f, // (1000.0 / streamFps) * 3,
+            .scaleMax = 60.0f, // (1000.0 / streamFps) * 3,
             .buffer = [[FloatBuffer alloc] initWithCapacity:512]
         };
 
@@ -72,6 +72,7 @@
 
         _plots[PLOT_DECODE] = {
             .title     = "Decode time",
+            
             .labelType = PLOT_LABEL_MIN_MAX_AVG,
             .unit      = "ms",
             .buffer    = [[FloatBuffer alloc] initWithCapacity:512]

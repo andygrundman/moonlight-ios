@@ -133,4 +133,20 @@ typedef struct {
     }
 }
 
+// For use with NSLog("%@", bwTracker);
+- (NSString *)description {
+    [_lock lock];
+    CFTimeInterval nowMs = CACurrentMediaTime() * 1000.0;
+    NSMutableArray *parts = [NSMutableArray arrayWithCapacity:_bucketCount];
+
+    for (NSUInteger i = 0; i < _bucketCount; i++) {
+        Bucket b = _buckets[i];
+        if ([self _isBucketValid:&b nowMs:nowMs]) {
+            [parts addObject:[NSString stringWithFormat:@"%lu", b.bytes]];
+        }
+    }
+    [_lock unlock];
+    return [NSString stringWithFormat:@"BandwidthTracker{ %@ }", [parts componentsJoinedByString:@","]];
+}
+
 @end

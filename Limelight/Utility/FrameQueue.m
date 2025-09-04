@@ -242,10 +242,10 @@
         if (next) {
 			[frame setDurationFromNext:next];
 		}
-		FQLog(LOG_I, @"[<- %d / %f%@] dequeue frame, queue size %d",
+		FQLog(LOG_I, @"[<- %d / %f%@] dequeue frame, queue size %d/%d",
 			frame.frameNumber, frame.pts,
 			[frame durationIsValid] ? [NSString stringWithFormat:@" dur %.3f ms", frame.duration * 1000.0] : @"",
-			_count);
+			_count, _highWaterMark);
     }
     os_unfair_lock_unlock(&_lock);
     return frame;

@@ -255,17 +255,15 @@
     [self.view addSubview:_spinner];
     [self.view addSubview:_tipLabel];
 
-    if ([_settings.renderingBackend intValue] == RENDER_METAL) {
-        // Metal view for video
-        Log(LOG_I, @"StreamFrameViewController creating MetalViewController");
-        self.metalViewController = [[MetalViewController alloc] initWithFrame:self.view.bounds
-                                                                    framerate:[self->_settings.framerate floatValue]
-                                                                    enableHdr:self->_settings.enableHdr
-                                                               metricsHandler:self.imguiView.metricsHandler];
-        self.metalViewController.view.userInteractionEnabled = NO;
-        [self.view addSubview:self.metalViewController.view];
-        [self.view bringSubviewToFront:self.metalViewController.view];
-    }
+    // Metal view for video
+    Log(LOG_I, @"StreamFrameViewController creating MetalViewController");
+    self.metalViewController = [[MetalViewController alloc] initWithFrame:self.view.bounds
+                                                                framerate:[self->_settings.framerate floatValue]
+                                                                enableHdr:self->_settings.enableHdr
+                                                           metricsHandler:self.imguiView.metricsHandler];
+    self.metalViewController.view.userInteractionEnabled = NO;
+    [self.view addSubview:self.metalViewController.view];
+    [self.view bringSubviewToFront:self.metalViewController.view];
 
     // Make a MetalKit view for ImGui
     self.imguiView = [[ImGuiRenderer alloc] initWithFrame:self.view.bounds

@@ -38,8 +38,6 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     StreamView* _view;
     id<ConnectionCallbacks> _callbacks;
     float _streamAspectRatio;
-
-    AVSampleBufferDisplayLayer* _displayLayer;
     int _videoFormat;
     int _frameRate;
 
@@ -47,65 +45,9 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     NSData *_masteringDisplayColorVolume;
     NSData *_contentLightLevelInfo;
     CMVideoFormatDescriptionRef _formatDesc;
-    CMVideoFormatDescriptionRef _formatDescImageBuffer;
     VTDecompressionSessionRef _decompressionSession;
 
-    CADisplayLink *_displayLink;
     FrameQueue *_frameQueue;
-    NSInteger _maxRefreshRate;
-    RenderingBackend _renderingBackend;
-
-}
-
-- (void)reinitializeDisplayLayer
-{
-    CALayer *oldLayer = _displayLayer;
-
-    _displayLayer = [[AVSampleBufferDisplayLayer alloc] init];
-    _displayLayer.backgroundColor = [UIColor blackColor].CGColor;
-
-    // Ensure the AVSampleBufferDisplayLayer is sized to preserve the aspect ratio
-    // of the video stream. We used to use AVLayerVideoGravityResizeAspect, but that
-    // respects the PAR encoded in the SPS which causes our computed video-relative
-    // touch location to be wrong in StreamView if the aspect ratio of the host
-    // desktop doesn't match the aspect ratio of the stream.
-    CGSize videoSize;
-    if (_view.bounds.size.width > _view.bounds.size.height * _streamAspectRatio) {
-        videoSize = CGSizeMake(_view.bounds.size.height * _streamAspectRatio, _view.bounds.size.height);
-    } else {
-        videoSize = CGSizeMake(_view.bounds.size.width, _view.bounds.size.width / _streamAspectRatio);
-    }
-    _displayLayer.position = CGPointMake(CGRectGetMidX(_view.bounds), CGRectGetMidY(_view.bounds));
-    _displayLayer.bounds = CGRectMake(0, 0, videoSize.width, videoSize.height);
-    _displayLayer.videoGravity = AVLayerVideoGravityResize;
-
-    // Hide the layer until we get an IDR frame. This ensures we
-    // can see the loading progress label as the stream is starting.
-    _displayLayer.hidden = YES;
-
-    if (oldLayer != nil) {
-        // Switch out the old display layer with the new one
-        [_view.layer replaceSublayer:oldLayer with:_displayLayer];
-    }
-    else {
-        [_view.layer addSublayer:_displayLayer];
-    }
-
-    if (_formatDesc != nil) {
-        CFRelease(_formatDesc);
-        _formatDesc = nil;
-    }
-
-    if (_formatDescImageBuffer != nil) {
-        CFRelease(_formatDescImageBuffer);
-        _formatDescImageBuffer = nil;
-    }
-
-    if (_decompressionSession != nil){
-        VTDecompressionSessionInvalidate(_decompressionSession);
-        CFRelease(_decompressionSession);
-        _decompressionSession = nil;
-    }
 }
 
 - (id)initWithView:(StreamView*)view callbacks:(id<ConnectionCallbacks>)callbacks streamAspectRatio:(float)aspectRatio
@@ -122,7 +64,6 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     _view = view;
     _callbacks = callbacks;
     _streamAspectRatio = aspectRatio;
-    _maxRefreshRate = [[UIScreen mainScreen] maximumFramesPerSecond];
     _parameterSetBuffers = [[NSMutableArray alloc] init];
 
     DataManager* dataMan = [[DataManager alloc] init];
@@ -131,12 +72,19 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     [_frameQueue start];
     [_frameQueue setHighWaterMark:(int)[[dataMan getSettings].frameQueueSize integerValue]];
 
-    [self reinitializeDisplayLayer];
+    if (_formatDesc != nil) {
+        CFRelease(_formatDesc);
+        _formatDesc = nil;
+    }
+
+    if (_decompressionSession != nil){
+        VTDecompressionSessionInvalidate(_decompressionSession);
+        CFRelease(_decompressionSession);
+        _decompressionSession = nil;
+    }
 
     return self;
 }
-
-# pragma mark DisplayLink vsync callback
 
 - (void)setupWithVideoFormat:(int)videoFormat width:(int)videoWidth height:(int)videoHeight frameRate:(int)frameRate
 {
@@ -146,27 +94,8 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     // reset plot data in case we've already used it for a previous renderer
     [[ImGuiPlots sharedInstance] clearData];
 
-    DataManager* dataMan = [[DataManager alloc] init];
-    if ([[dataMan getSettings].renderingBackend integerValue] == RENDER_AVSB) {
-        // PACING_MODE_VSYNC:
-        // Deliver 1 frame at each vsync interval. Ignores server pts timestamps.
-        // Drop frames intelligently to maintain chosen queue size.
-        _renderingBackend = RENDER_AVSB;
-        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(renderModeAVSB:)];
-
-        if (@available(iOS 15.0, tvOS 15.0, *)) {
-            _displayLink.preferredFrameRateRange = CAFrameRateRangeMake(self->_frameRate, self->_frameRate, self->_frameRate);
-        }
-        else {
-            _displayLink.preferredFramesPerSecond = self->_frameRate;
-        }
-        [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-    } else {
-        _renderingBackend = RENDER_METAL;
-        // RENDER_METAL begins in StreamFrameViewController.
-    }
+    // RENDER_METAL begins in StreamFrameViewController
 }
-
 
 - (void)setupDecompressionSessionWithAttributes:(NSDictionary *)destinationPixelBufferAttributes {
     if (_decompressionSession != NULL) {
@@ -208,141 +137,11 @@ extern int ff_isom_write_av1c(AVIOContext *pb, const uint8_t *buf, int size,
     return [self setupDecompressionSessionWithAttributes:destinationPixelBufferAttributes];
 }
 
-- (void) checkDisplayLayer {
-    // Check for issues with the SampleBuffer, this should be much less likely since
-    // AVSB is not actually decoding the frames anymore
-    if (self->_displayLayer.status == AVQueuedSampleBufferRenderingStatusFailed) {
-        Log(LOG_E, @"Display layer rendering failed: %@", _displayLayer.error);
-
-        // Recreate the display layer. We are already on the main thread,
-        // so this is safe to do right here.
-        [self reinitializeDisplayLayer];
-
-        // Request an IDR frame to initialize the new decoder
-        LiRequestIdrFrame();
-    }
-}
-
 int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
-
-#pragma mark DisplayLink - Frame Pacing - Vsync with FrameQueue
-
-// This frame pacing method was inspired by the behavior of moonlight-qt's Pacer class, although it has evolved
-// a few additional features. Incoming frames from Sunshine are asynchronously processed into a queue by the VideoRecv thread.
-// DisplayLink calls us every vsync we we try to present the most recent frame. We try to maintain a user-configurable buffer
-// of 1-5 frames. If the buffer is full, every other frame is dropped which just appears to the user as a lower framerate stream.
-- (void)renderModeAVSB:(CADisplayLink *)link {
-    CFTimeInterval start = link.timestamp;
-    CFTimeInterval deadline = link.targetTimestamp;
-    static CFTimeInterval lastTargetLocal = 0.0f;
-    CFTimeInterval dl0 = CACurrentMediaTime();
-
-    static int lateCallbacks = 0;
-    if (dl0 > deadline) {
-        // we already missed it, count how often this happens
-        lateCallbacks++;
-        return;
-    }
-
-    [self checkDisplayLayer];
-
-    static CFTimeInterval avgOverhead = 0.004f; // averaged each callback
-    CFTimeInterval waitFor = deadline - dl0 - avgOverhead;
-    if (waitFor < 0.001f) {
-        waitFor = 0.0f;
-    }
-
-    // Get the next frame or wait if necessary. If no frame arrives the previous one will be redisplayed automatically.
-    Frame *frame = [_frameQueue dequeueWithTimeout:waitFor];
-    if (frame) {
-        CFTimeInterval dl1 = CACurrentMediaTime();
-
-        LogOnce(LOG_I, @"Frame pacing: using AVSampleBufferDisplayLayer target %f Hz with %d FPS stream", 1.0f / (deadline - start), self->_frameRate);
-
-        // The system works best with properly timed video frames, which we time to the end of the next vsync period,
-        // the earliest they can be displayed due to double-buffering.
-        CFTimeInterval targetLocal = deadline + link.duration;
-
-        [self renderFrame:frame atTime:CMTimeMakeWithSeconds(targetLocal, NSEC_PER_SEC)];
-
-#ifdef DISPLAYLINK_VERBOSE
-        Log(LOG_I, @"[%.3f] rendering frame %d, waitFor %.3f ms, overhead %.3f ms, lateCallbacks %d, queue size %d",
-            deadline, frame.frameNumber, waitFor * 1000.0, avgOverhead * 1000.0, lateCallbacks, [_frameQueue count]);
-#endif
-
-        // Update metrics
-        if (lastTargetLocal != 0) {
-            CFTimeInterval frametime = targetLocal - lastTargetLocal;
-            if (frametime > deadline - start + 0.0005f) {
-                // we missed a callback
-                // Log(LOG_W, @"*** slow frametime %.3f ms", frametime * 1000.0);
-            }
-            [[ImGuiPlots sharedInstance] observeFloat:PLOT_FRAMETIME value:frametime * 1000.0];
-        }
-        lastTargetLocal = targetLocal;
-
-        // weighted moving average of how much time displayLink needs after dequeuing a frame.
-        // This is used to avoid overshooting a vsync by waiting too long.
-        const double alpha = 0.1f;
-        avgOverhead = ((CACurrentMediaTime() - dl1) * alpha) + (avgOverhead * (1.0 - alpha));
-    }
-}
-
-// Render frame at a specific targetTime
-- (void)renderFrame:(Frame *)frame atTime:(CMTime)targetTime {
-    CMSampleBufferSetOutputPresentationTimeStamp(frame.sampleBuffer, targetTime);
-
-    if (frame.frameNumber == 1) {
-        // On first frame, set timebase to the initial presentation time.
-        // This will let us present frames using the local clock (vsync pacing) or
-        // the pts timestamps from the host.
-        CMTimebaseRef timebase = NULL;
-        CMTimebaseCreateWithSourceClock(CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &timebase);
-
-        // Set the timebase to the initial pts here
-        CMTime pts = CMSampleBufferGetOutputPresentationTimeStamp(frame.sampleBuffer);
-        CMTimebaseSetTime(timebase, pts);
-        CMTimebaseSetRate(timebase, 1.0);
-
-        [self->_displayLayer setControlTimebase:timebase];
-        Log(LOG_I, @"Setting timebase for stream to %d / %d", pts.value, pts.timescale);
-    }
-
-    [self->_displayLayer enqueueSampleBuffer:frame.sampleBuffer];
-
-#ifdef DISPLAYLINK_VERBOSE
-    // Some OS-level metrics I'm not sure what to do with
-    if (@available(iOS 17.4, tvOS 17.4, *)) {
-        if (frame.frameNumber % 600 == 0) {
-            [self->_displayLayer.sampleBufferRenderer loadVideoPerformanceMetricsWithCompletionHandler:^(AVVideoPerformanceMetrics * videoMetrics) {
-                Log(LOG_I, @"AVVideoPerformanceMetrics: frames %d, dropped %d (%.1f%%), optimized %d (%.1f%%), accumulatedDelay %f",
-                    videoMetrics.totalNumberOfFrames, // The total number of frames that display if no frames drop.
-                    videoMetrics.numberOfDroppedFrames, // The total number of frames the system drops prior to decoding or from missing the display deadline
-                    ((double)videoMetrics.numberOfDroppedFrames / videoMetrics.totalNumberOfFrames) * 100.0,
-                    videoMetrics.numberOfFramesDisplayedUsingOptimizedCompositing, // The total number of full screen frames rendered in a special power-efficient mode that didn’t require compositing with other UI elements.
-                    ((double)videoMetrics.numberOfFramesDisplayedUsingOptimizedCompositing / videoMetrics.totalNumberOfFrames) * 100.0,
-                    videoMetrics.totalAccumulatedFrameDelay); // The accumulated amount of time between the prescribed presentation times of displayed video frames and their actual time of display.
-            }];
-        }
-    }
-#endif
-
-    if (frame.frameType == FRAME_TYPE_IDR) {
-        // Ensure the layer is visible now
-        self->_displayLayer.hidden = NO;
-
-        // Tell our parent VC to hide the progress indicator
-        [self->_callbacks videoContentShown];
-    }
-}
 
 - (void)cleanup
 {
     [_frameQueue stop];
-
-    if (_renderingBackend == RENDER_AVSB) {
-        [_displayLink invalidate];
-    }
 
     if (_decompressionSession != NULL) {
         VTDecompressionSessionInvalidate(_decompressionSession);
@@ -815,7 +614,7 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
     CFRelease(frameBlockBuffer);
     CFRelease(sampleBuffer);
 
-    return DR_OK;
+    return (decodeStatus == noErr) ? DR_OK : DR_NEED_IDR;
 }
 
 - (OSStatus)decodeFrameWithSampleBuffer:(CMSampleBufferRef)sampleBuffer
@@ -839,49 +638,14 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
             return;
           }
 
-          CMSampleBufferRef sampleBufferOut = nil;
-          CVPixelBufferRef pixelBuffer = nil;
-
-          // AVSampleBuffer path: package into a SampleBuffer
-          if (self->_renderingBackend == RENDER_AVSB) {
-            if (self->_formatDescImageBuffer == NULL || !CMVideoFormatDescriptionMatchesImageBuffer(self->_formatDescImageBuffer, imageBuffer)) {
-              OSStatus res = CMVideoFormatDescriptionCreateForImageBuffer(kCFAllocatorDefault, imageBuffer, &(self->_formatDescImageBuffer));
-              if (res != noErr) {
-                Log(LOG_E, @"Failed to create video format description from imageBuffer");
-                return;
-              }
-            }
-
-            if (self->_formatDescImageBuffer == NULL || !CMVideoFormatDescriptionMatchesImageBuffer(self->_formatDescImageBuffer, imageBuffer)) {
-              OSStatus res = CMVideoFormatDescriptionCreateForImageBuffer(kCFAllocatorDefault, imageBuffer, &(self->_formatDescImageBuffer));
-              if (res != noErr) {
-                Log(LOG_E, @"Failed to create video format description from imageBuffer");
-                return;
-              }
-            }
-
-            CMSampleTimingInfo sampleTiming = {kCMTimeInvalid, presentationTimestamp, presentationDuration};
-
-            OSStatus err =
-                CMSampleBufferCreateReadyWithImageBuffer(kCFAllocatorDefault, imageBuffer, self->_formatDescImageBuffer, &sampleTiming, &sampleBufferOut);
-            if (err != noErr) {
-              Log(LOG_E, @"Error creating sample buffer for decompressed image buffer %d", (int)err);
-              return;
-            }
-          } else if (self->_renderingBackend == RENDER_METAL) {
-            // Metal path: retain the pixelBuffer here so it survives the dispatch
-            pixelBuffer = CVPixelBufferRetain((CVPixelBufferRef)imageBuffer);
-          }
+          // retain the pixelBuffer here so it survives the dispatch
+          CVPixelBufferRef pixelBuffer = CVPixelBufferRetain((CVPixelBufferRef)imageBuffer);
 
           // Dispatch onto our higher priority queue
           dispatch_async(self->_vtq, ^{
-              Frame *frame = nil;
-              if (self->_renderingBackend == RENDER_AVSB) {
-                frame = [[Frame alloc] initWithSampleBuffer:sampleBufferOut frameNumber:frameNumber frameType:frameType];
-              } else {
-                frame = [[Frame alloc] initWithPixelBufffer:pixelBuffer frameNumber:frameNumber frameType:frameType pts:presentationTimestamp];
-                [frame setFormatDesc:self->_formatDesc];
-              }
+              Frame *frame = [[Frame alloc] initWithPixelBufffer:pixelBuffer frameNumber:frameNumber frameType:frameType pts:presentationTimestamp];
+              [frame setFormatDesc:self->_formatDesc];
+
               int framesDropped = [self->_frameQueue enqueue:frame withSlackSize:3];
 
               static PlotMetrics frameQueueMetrics = {};
@@ -995,71 +759,11 @@ int DrSubmitDecodeUnit(PDECODE_UNIT decodeUnit);
 }
 
 - (void)getAllStats:(video_stats_t *)stats {
-    if (_renderingBackend == RENDER_METAL) {
-        stats->renderingBackendString = [NSString stringWithFormat:@"Metal, colorspace: %@", [MetalVideoRenderer currentColorSpace]];
-    } else {
-        stats->renderingBackendString = @"AVSampleBuffer";
-    }
-
     dispatch_sync(_sq, ^{
         memcpy(&stats->decodeMetrics, &_decodeMetrics, sizeof(PlotMetrics));
         memcpy(&stats->frameQueueMetrics, &_frameQueueMetrics, sizeof(PlotMetrics));
         [_frameQueue.frameDropMetrics copyMetrics:&stats->frameDropMetrics];
     });
-}
-
-// When streaming lower framerate content on a ProMotion display, the screen refresh rate can be
-// reduced, optimizing battery life. Not currently used, it doesn't seem as reliable as I'd like.
-- (void)optimizeRefreshRate {
-    static NSArray<NSNumber *> *supportedRates;
-    static dispatch_once_t onceToken;
-    static int lastTargetRate = 0;
-    int targetRate = (int)_maxRefreshRate;
-
-    if (_maxRefreshRate <= 60 || _maxRefreshRate == 90) {
-        return;
-    }
-
-    dispatch_once(&onceToken, ^{
-        // https://developer.apple.com/documentation/quartzcore/optimizing-promotion-refresh-rates-for-iphone-13-pro-and-ipad-pro?language=objc
-        UIDevice *device = [UIDevice currentDevice];
-        if (device.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-            supportedRates = @[@24, @30, @40, @60, @120];
-        }
-        else if (device.userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-            supportedRates = @[@10, @12, @15, @16, @20, @24, @30, @40, @48, @60, @80, @120];
-        }
-        else {
-            supportedRates = @[@30, @60];
-        }
-    });
-
-    CFTimeInterval streamFps = [_frameQueue estimatedFramerate];
-    if (streamFps > _maxRefreshRate) {
-        streamFps = _maxRefreshRate;
-    }
-
-    for (NSNumber *r in supportedRates) {
-        NSInteger rate = r.integerValue;
-        if (rate >= (int)streamFps) {
-            targetRate = (int)rate;
-            break;
-        }
-    }
-
-    if (targetRate == lastTargetRate) {
-        return;
-    }
-    lastTargetRate = targetRate;
-
-    Log(LOG_I, @"optimizeRefreshRate: new rate %d Hz based on streamFps of %.2f fps", targetRate, streamFps);
-
-    if (@available(iOS 15.0, tvOS 15.0, *)) {
-        _displayLink.preferredFrameRateRange = CAFrameRateRangeMake(targetRate, _maxRefreshRate, targetRate);
-    }
-    else {
-        _displayLink.preferredFramesPerSecond = targetRate;
-    }
 }
 
 @end
